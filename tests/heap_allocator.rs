@@ -1,7 +1,7 @@
 #![no_std]
 #![no_main]
 #![feature(custom_test_frameworks)]
-#![test_runner(fario::test_runner)]
+#![test_runner(flario::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
 extern crate alloc;
@@ -10,12 +10,12 @@ use alloc::boxed::Box;
 use alloc::vec::Vec;
 use bootloader::{entry_point, BootInfo};
 use core::panic::PanicInfo;
-use fario::kernel::mem::globalloc::heap::HEAP_SIZE;
+use flario::kernel::mem::globalloc::heap::HEAP_SIZE;
 
 entry_point!(main);
 
 fn main(boot_info: &'static BootInfo) -> ! {
-    use fario::*;
+    use flario::*;
     init();
     let mut mem_items = mem_init(boot_info);
 
@@ -61,5 +61,5 @@ fn many_boxes_long_lived() {
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    fario::test_panic_handler(info)
+    flario::test_panic_handler(info)
 }

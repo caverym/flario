@@ -1,18 +1,18 @@
 #![no_std]
 #![no_main]
 #![feature(custom_test_frameworks)]
-#![test_runner(fario::test_runner)]
+#![test_runner(flario::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
 extern crate alloc;
 
-use fario::kernel::task::executor::Executor;
-use fario::kernel::task::Task;
-use fario::*;
+use flario::kernel::task::executor::Executor;
+use flario::kernel::task::Task;
+use flario::*;
 // Defines entry point for the bootloader, bootloader defines_start function.
 entry_point!(main);
 
-/// The main entry point of the fario kernel.
+/// The main entry point of the flario kernel.
 fn main(boot_info: &'static BootInfo) -> ! {
     // Initiate GDT, IDT, & PIC.
     init();
@@ -43,7 +43,7 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 #[cfg(test)]
 #[panic_handler]
 fn panic(info: &core::panic::PanicInfo) -> ! {
-    fario::test_panic_handler(info)
+    flario::test_panic_handler(info)
 }
 
 /// Test allocation of memory

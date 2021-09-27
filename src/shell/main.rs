@@ -6,7 +6,7 @@ use pc_keyboard::layouts::Us104Key;
 use pc_keyboard::KeyCode;
 use pc_keyboard::{layouts, DecodedKey, HandleControl, Keyboard, ScancodeSet1};
 
-/// Main function for fario shell.
+/// Main function for flario shell.
 pub async fn shell() {
     // Initiate scancode stream
     let mut scancodes = ScancodeStream::new();
@@ -14,7 +14,7 @@ pub async fn shell() {
     let mut keyboard = Keyboard::new(layouts::Us104Key, ScancodeSet1, HandleControl::Ignore);
 
     // Print title
-    vga_println!("Fario shell");
+    vga_println!("flario shell");
     // Program wide error code.
     let mut code: i32 = 0;
 
@@ -53,10 +53,10 @@ pub async fn shell() {
     }
 
     // print Exit message and code.
-    vga_println!("exiting fario shell... code: {}", code as u32);
+    vga_println!("exiting flario shell... code: {}", code as u32);
 }
 
-/// Maths shell. A shell inside fario shell to do simple math operations.
+/// Maths shell. A shell inside flario shell to do simple math operations.
 async fn maths(
     scancodes: &mut ScancodeStream,
     keyboard: &mut Keyboard<Us104Key, ScancodeSet1>,
@@ -256,9 +256,9 @@ fn exit() -> i32 {
 
 /// About shell text for about program
 const ABOUT_SHELL: &str = "\
-Fario Shell.
+flario Shell.
 
-Fario shell is a basic user shell implemented inside the Fario Kernel as a
+flario shell is a basic user shell implemented inside the flario Kernel as a
 task. The shell is in a Rust #![no_std] environment and is mostly a proof of
 concept. I believe a working user interface, CLI, TUI, or GUI is required to
 prove a working environment.
@@ -292,11 +292,11 @@ fn command_not_found(s: &str) -> i32 {
 
 /// Help message for help program
 const HELP_MSG: &str = "\
-Fario Shell Help.
+flario Shell Help.
 
 Commands:
     help:        View help and commands,
-    exit:        Exit Fario shell,
+    exit:        Exit flario shell,
     about:       About the shell or other commands,
 ";
 

@@ -2,14 +2,14 @@
 #![no_std]
 #![no_main]
 
-use fario::{drivers::qemu, vs_print, vs_println};
+use flario::{drivers::qemu, vs_print, vs_println};
 use lazy_static::lazy_static;
 use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
     vs_print!("stack_overflow...");
-    fario::init();
+    flario::init();
     init_test_idt();
     stack_overflow();
     panic!("Execution continued after stack overflow");
@@ -17,7 +17,7 @@ pub extern "C" fn _start() -> ! {
 
 #[panic_handler]
 fn panic(info: &core::panic::PanicInfo) -> ! {
-    fario::test_panic_handler(info);
+    flario::test_panic_handler(info);
 }
 
 #[allow(unconditional_recursion)]
@@ -32,7 +32,7 @@ lazy_static! {
         unsafe {
             idt.double_fault
                 .set_handler_fn(test_double_fault_handler)
-                .set_stack_index(fario::kernel::gdt::DOUBLE_FAULT_IST_INDEX);
+                .set_stack_index(flario::kernel::gdt::DOUBLE_FAULT_IST_INDEX);
         }
 
         idt

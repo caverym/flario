@@ -2,7 +2,7 @@
 #![no_main]
 
 use core::panic::PanicInfo;
-use fario::{drivers::qemu, vs_println, Testable};
+use flario::{drivers::qemu, vs_println, Testable};
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {

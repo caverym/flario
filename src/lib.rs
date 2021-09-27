@@ -103,19 +103,21 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
     test_panic_handler(info)
 }
 
-/// fario ascii logo
-const fario: &str = ",------.,--.               ,--.
+/// flario ascii logo
+const FLARIO: &str = "\
+,------.,--.               ,--.
 |  .---'|  | ,--,--.,--.--.`--' ,---.
 |  `--, |  |' ,-.  ||  .--',--.| .-. |
 |  |`   |  |\\ '-'  ||  |   |  |' '-' '
-`--'    `--' `--`--'`--'   `--' `---' ";
+`--'    `--' `--`--'`--'   `--' `---'\
+";
 
 /// Release welcome message
 #[cfg(not(debug_assertions))]
 pub async fn welcome() {
     vga_println!(
         "{}\n\nversion {}-release by:\n{}",
-        fario,
+        flario,
         env!("CARGO_PKG_VERSION"),
         env!("CARGO_PKG_AUTHORS"),
     );
@@ -126,7 +128,7 @@ pub async fn welcome() {
 pub async fn welcome() {
     vga_println!(
         "{}\n\nversion {}-debug by:\n{}",
-        fario,
+        FLARIO,
         env!("CARGO_PKG_VERSION"),
         env!("CARGO_PKG_AUTHORS"),
     );
