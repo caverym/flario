@@ -6,7 +6,7 @@ use pc_keyboard::layouts::Us104Key;
 use pc_keyboard::KeyCode;
 use pc_keyboard::{layouts, DecodedKey, HandleControl, Keyboard, ScancodeSet1};
 
-/// Main function for Flario shell.
+/// Main function for fario shell.
 pub async fn shell() {
     // Initiate scancode stream
     let mut scancodes = ScancodeStream::new();
@@ -53,10 +53,10 @@ pub async fn shell() {
     }
 
     // print Exit message and code.
-    vga_println!("exiting Flario shell... code: {}", code as u32);
+    vga_println!("exiting fario shell... code: {}", code as u32);
 }
 
-/// Maths shell. A shell inside Flario shell to do simple math operations.
+/// Maths shell. A shell inside fario shell to do simple math operations.
 async fn maths(
     scancodes: &mut ScancodeStream,
     keyboard: &mut Keyboard<Us104Key, ScancodeSet1>,

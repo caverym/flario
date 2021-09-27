@@ -67,7 +67,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "flario"
+name = "fario"
 version = "0.1.0"
 dependencies = [
  "bootloader",

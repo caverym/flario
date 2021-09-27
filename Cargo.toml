@@ -1,5 +1,5 @@
 [package]
-name = "flario"
+name = "fario"
 authors = ["Avery Murray <caverym@disroot.org>"]
 version = "0.1.0"
 edition = "2018"
