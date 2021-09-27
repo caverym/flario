@@ -1,3 +1,3 @@
-mod vector;
-mod string;
 pub mod main;
+mod string;
+mod vector;

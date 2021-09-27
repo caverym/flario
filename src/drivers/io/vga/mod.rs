@@ -2,17 +2,25 @@ use lazy_static::lazy_static;
 use spin::Mutex;
 use volatile::Volatile;
 
+/*
+This is the VGA driver. Will print to the standard VGA buffer at 0xb8000.
+The `WRITER` handle prints yellow text to a black background.
+*/
+
+/// Prints to vga using `WRITER`
 #[macro_export]
 macro_rules! vga_print {
 	($($arg:tt)*) => ($crate::drivers::io::vga::_print(format_args!($($arg)*)));
 }
 
+/// Prints to VGA using `WRITER` with a newline at the end.
 #[macro_export]
 macro_rules! vga_println {
 	() => ($crate::vga_print!("\n"));
 	($($arg:tt)*) => ($crate::vga_print!("{}\n", format_args!($($arg)*)));
 }
 
+/// The real function to print to the VGA buffer using WRITER.
 #[doc(hidden)]
 pub fn _print(args: core::fmt::Arguments) {
     use core::fmt::Write;
@@ -26,6 +34,7 @@ pub fn _print(args: core::fmt::Arguments) {
     });
 }
 
+/// VGA Color — C like Enum to define VGA compatible colors.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum Color {
@@ -47,23 +56,31 @@ pub enum Color {
     White = 0x0f,
 }
 
+/// Structure to hold a color code.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(transparent)]
 pub struct ColorCode(u8);
 
+
 impl ColorCode {
+    /// Creates a new instance of `ColorCode` from foreground and background `Color` Enums.
     pub fn new(foreground: Color, background: Color) -> ColorCode {
         ColorCode((background as u8) << 4 | (foreground as u8))
     }
 }
 
+/// ScreenChar structure written to VGA buffer, contains character byte and `ColorCode`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ScreenChar {
+    /// ascii character byte
     pub ascii_character: u8,
+    /// color code for the color of this byte
     pub color_code: ColorCode,
 }
 
+/// BUFFER HEIGHT — The high of the VGA buffer.
 pub const BUFFER_HEIGHT: usize = 25;
+/// BUFFER_WIDTH — The width of the VGA buffer.
 pub const BUFFER_WIDTH: usize = 80;
 
 #[derive(Debug)]

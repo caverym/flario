@@ -11,34 +11,43 @@ extern crate alloc;
 
 pub use bootloader::{entry_point, BootInfo};
 
+// Defines entry point for tests.
 #[cfg(test)]
 entry_point!(test_main_entry);
+
 
 pub mod drivers;
 pub mod kernel;
 pub mod shell;
 
+/// CPU Halt instruction. Halts CPU execution in an infinite loop.
 pub fn halt() -> ! {
     loop {
         x86_64::instructions::hlt();
     }
 }
 
+/// CPU Halt instruction. Halts CPU once.
 pub fn halt_wr() {
     x86_64::instructions::hlt();
 }
 
+/// The `init()` function initiates the x86 CPU's GDT, IDT and PIC in order.
 pub fn init() {
     kernel::gdt::init();
     kernel::interrupts::idt::init();
     kernel::interrupts::pic::init();
 }
 
+
+/// The `mem_init` function initiates memory, heap, and the global allocator. Returns a Memory item struct.
 pub fn mem_init(boot_info: &'static BootInfo) -> kernel::mem::MemoryItems {
     kernel::mem::mem_init(boot_info)
 }
 
+/// Teastable trait, trait to run code tests
 pub trait Testable {
+    /// Run function for code tests.
     fn run(&self) -> ();
 }
 
@@ -53,6 +62,7 @@ where
     }
 }
 
+/// Test harness
 pub fn test_runner(tests: &[&dyn Testable]) {
     use drivers::qemu::*;
     vs_println!("Running {} test(s)", tests.len());
@@ -64,6 +74,7 @@ pub fn test_runner(tests: &[&dyn Testable]) {
     exit_qemu(QemuExitCode::Success);
 }
 
+/// Panic handler when running tests, to exit QEMU using QEMU driver.
 pub fn test_panic_handler(info: &core::panic::PanicInfo) -> ! {
     use drivers::qemu::*;
     vs_println!("[failed]\n");
@@ -71,6 +82,7 @@ pub fn test_panic_handler(info: &core::panic::PanicInfo) -> ! {
     exit_qemu(QemuExitCode::Failed);
 }
 
+/// Entry point when testing.
 #[cfg(test)]
 fn test_main_entry(_boot_info: &'static BootInfo) -> ! {
     init();
@@ -78,23 +90,27 @@ fn test_main_entry(_boot_info: &'static BootInfo) -> ! {
     loop {}
 }
 
+/// Test breakpoint exception
 #[test_case]
 fn test_breakpoint_exception() {
     x86_64::instructions::interrupts::int3();
 }
 
+/// Panic handler for Tests, runs `test_panic_handler`
 #[cfg(test)]
 #[panic_handler]
 fn panic(info: &core::panic::PanicInfo) -> ! {
     test_panic_handler(info)
 }
 
+/// FLARIO ascii logo
 const FLARIO: &str = ",------.,--.               ,--.
 |  .---'|  | ,--,--.,--.--.`--' ,---.
 |  `--, |  |' ,-.  ||  .--',--.| .-. |
 |  |`   |  |\\ '-'  ||  |   |  |' '-' '
 `--'    `--' `--`--'`--'   `--' `---' ";
 
+/// Release welcome message
 #[cfg(not(debug_assertions))]
 pub async fn welcome() {
     vga_println!(
@@ -105,6 +121,7 @@ pub async fn welcome() {
     );
 }
 
+/// Debug welcome message
 #[cfg(debug_assertions)]
 pub async fn welcome() {
     vga_println!(

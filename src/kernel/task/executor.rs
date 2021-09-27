@@ -6,7 +6,11 @@ use core::task::Waker;
 use core::task::{Context, Poll};
 use crossbeam_queue::ArrayQueue;
 use futures_util::FutureExt;
+/*
+Asynchronous execute for kernel tasks. Currently used for welcome message and shell.
+ */
 
+/// Executor itself. Contains a map of tasks, queue and Wakers/
 pub struct Executor {
     tasks: BTreeMap<TaskId, Task>,
     task_queue: Arc<ArrayQueue<TaskId>>,
@@ -14,6 +18,7 @@ pub struct Executor {
 }
 
 impl Executor {
+    /// Creates an empty Executor
     pub fn new() -> Self {
         Executor {
             tasks: BTreeMap::new(),
@@ -22,6 +27,7 @@ impl Executor {
         }
     }
 
+    /// Runs the executor's tasks. Never returns.
     pub fn run(&mut self) -> ! {
         loop {
             self.run_ready_tasks();
@@ -29,6 +35,7 @@ impl Executor {
         }
     }
 
+    /// Spawn a task, adds a task to the queue.
     pub fn spawn(&mut self, task: Task) {
         dbg_vs_println!("spawning task: {}", task.id.0);
         let task_id = task.id;
@@ -38,6 +45,7 @@ impl Executor {
         self.task_queue.push(task_id).expect("queue full");
     }
 
+    /// Looks for Ready tasks, removes them from queue when complete, pushes them back when executing.
     fn run_ready_tasks(&mut self) {
         // destructure `self` to avoid borrow checker errors
         let Self {
@@ -46,49 +54,66 @@ impl Executor {
             waker_cache,
         } = self;
 
+        // Loop for every TaskId in queue.
         while let Some(task_id) = task_queue.pop() {
+            // Get a reference to a task from its ID.
             let task = match tasks.get_mut(&task_id) {
                 Some(t) => t,
-                None => continue,
+                None => continue, // go to next ID in queue.
             };
 
+            // Debug print which task is running.
             dbg_vs_println!("running ready task: {}", task.id.0);
 
+            // get waker reference based on the task's ID
             let waker = waker_cache
                 .entry(task_id)
                 .or_insert_with(|| TaskWaker::new(task_id, task_queue.clone()));
 
+            // Get the Task's context.
             let mut context = Context::from_waker(waker);
 
+            // Poll the task's state with context.
             match task.future.poll_unpin(&mut context) {
+                // Task is complete, remove from queue and its waker from cache
                 Poll::Ready(()) => {
                     tasks.remove(&task_id);
                     waker_cache.remove(&task_id);
                 }
-                Poll::Pending => {dbg_vs_println!("task {} still pending", task.id.0)}
+                // Task is not complete, do nothing
+                Poll::Pending => {
+                    // debug print which task is pending
+                    dbg_vs_println!("task {} still pending", task.id.0)
+                }
             }
         }
     }
 
+    /// halt the thread when all tasks complete.
     fn sleep_if_idle(&self) {
         use x86_64::instructions::interrupts::{self, enable_and_hlt};
 
+        // disable CPU interrupts
         interrupts::disable();
         if self.task_queue.is_empty() {
+            // queue is empty, enable interrupts and halt the thread.
             enable_and_hlt();
         } else {
+            // queue is not empty, enable interrupts and returns.
             dbg_vs_println!("exe queue not empty");
             interrupts::enable();
         }
     }
 }
 
+/// Task waker wakes a task.
 struct TaskWaker {
     task_id: TaskId,
     task_queue: Arc<ArrayQueue<TaskId>>,
 }
 
 impl TaskWaker {
+    /// Create a new TaskWaker with a task's ID and queue.
     fn new(task_id: TaskId, task_queue: Arc<ArrayQueue<TaskId>>) -> Waker {
         Waker::from(Arc::new(TaskWaker {
             task_id,
@@ -96,6 +121,7 @@ impl TaskWaker {
         }))
     }
 
+    // wake the task
     fn wake_task(&self) {
         self.task_queue.push(self.task_id).expect("task_queue full");
     }

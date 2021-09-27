@@ -29,14 +29,20 @@ macro_rules! dbg_vs_println {
 #[cfg(not(debug_assertions))]
 #[macro_export]
 macro_rules! dbg_vs_print {
-	($($arg:tt)*) => ($crate::drivers::io::_nothing());
+    ($($arg:tt)*) => {
+        $crate::drivers::io::_nothing()
+    };
 }
 
 #[cfg(not(debug_assertions))]
 #[macro_export]
 macro_rules! dbg_vs_println {
-	() => ($crate::drivers::io::_nothing());
-	($($arg:tt)*) => ($crate::drivers::io::_nothing());
+    () => {
+        $crate::drivers::io::_nothing()
+    };
+    ($($arg:tt)*) => {
+        $crate::drivers::io::_nothing()
+    };
 }
 
 #[doc(hidden)]

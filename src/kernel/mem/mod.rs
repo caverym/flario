@@ -7,12 +7,14 @@ use bootloader::BootInfo;
 use x86_64::structures::paging::OffsetPageTable;
 use x86_64::VirtAddr;
 
+/// Memory items structure. Contains offset_page_table (mapper) and frame_allocator
 #[derive(Debug)]
 pub struct MemoryItems {
     pub offset_page_table: OffsetPageTable<'static>,
     pub frame_allocator: BootInfoFrameAllocator,
 }
 
+/// low-level memory initialization function, initates the offset_page_table, frame_allocator and global allocator
 pub fn mem_init(boot_info: &'static BootInfo) -> MemoryItems {
     let mut offset_page_table =
         unsafe { page::init(VirtAddr::new(boot_info.physical_memory_offset)) };

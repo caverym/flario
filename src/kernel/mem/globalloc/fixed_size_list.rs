@@ -5,21 +5,27 @@ use core::ptr;
 use core::ptr::NonNull;
 use linked_list_allocator::Heap;
 
+/// Fixed size node for memory allocation
 struct ListNode {
     next: Option<&'static mut ListNode>,
 }
 
+/// Possible sizes for each node.
 const BLOCK_SIZES: &[usize] = &[8, 16, 32, 64, 128, 256, 512, 1024, 2048];
 
+/// CONSTANT size of ListNode type
 const NODE_SIZE: usize = core::mem::size_of::<ListNode>();
+/// CONSTANT alignment of ListNode type
 const NODE_ALLIGN: usize = core::mem::align_of::<ListNode>();
 
+/// The Fixed sized allocator. contains list of Nodes
 pub struct FixedSizeAllocator {
     list_heads: [Option<&'static mut ListNode>; BLOCK_SIZES.len()],
     fallback_allocator: Heap,
 }
 
 impl FixedSizeAllocator {
+    /// Creates a new allocator
     pub const fn new() -> Self {
         const EMPTY: Option<&'static mut ListNode> = None;
         FixedSizeAllocator {
@@ -28,10 +34,12 @@ impl FixedSizeAllocator {
         }
     }
 
+    /// initiates the allocator by initiating the fallback allocator.
     pub unsafe fn init(&mut self, heap_start: usize, heap_size: usize) {
         self.fallback_allocator.init(heap_start, heap_size)
     }
 
+    /// allocate using fallback
     fn fallback_alloc(&mut self, layout: Layout) -> *mut u8 {
         match self.fallback_allocator.allocate_first_fit(layout) {
             Ok(ptr) => ptr.as_ptr(),
@@ -39,25 +47,31 @@ impl FixedSizeAllocator {
         }
     }
 
+    /// deallocate using fallback
     fn fallback_dealloc(&mut self, ptr: NonNull<u8>, layout: Layout) {
         unsafe { self.fallback_allocator.deallocate(ptr, layout) }
     }
 }
 
+/// returns an index to use if available
 fn list_index(layout: &Layout) -> Option<usize> {
     let required_block_size = layout.size().max(layout.align());
     BLOCK_SIZES.iter().position(|&s| s >= required_block_size)
 }
 
+/// Implement global allocation (alloc and dealloc functions) on FixedSizeList
 unsafe impl GlobalAlloc for Locked<FixedSizeAllocator> {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
+        // lock our allocator into the thread
         let mut allocator = self.lock();
         match list_index(&layout) {
+            // if space is available, allocate and return its position (pointer)
             Some(index) => match allocator.list_heads[index].take() {
                 Some(node) => {
                     allocator.list_heads[index] = node.next.take();
                     node as *mut ListNode as *mut u8
                 }
+                // if allocation fails, fallback
                 None => {
                     let block_size = BLOCK_SIZES[index];
                     let block_align = block_size;
@@ -65,10 +79,12 @@ unsafe impl GlobalAlloc for Locked<FixedSizeAllocator> {
                     allocator.fallback_alloc(layout)
                 }
             },
+            // if space is unavailable, fallback
             None => allocator.fallback_alloc(layout),
         }
     }
 
+    /// same but reversed ???
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
         let mut allocator = self.lock();
         match list_index(&layout) {

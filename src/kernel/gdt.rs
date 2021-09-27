@@ -9,6 +9,10 @@ use x86_64::{
     VirtAddr,
 };
 
+/*
+Defines the General Descriptor Table.
+ */
+
 pub const DOUBLE_FAULT_IST_INDEX: u16 = 0;
 
 lazy_static! {
@@ -46,6 +50,7 @@ struct Selectors {
     tss_selector: SegmentSelector,
 }
 
+/// initiates GDT, setting it in CPU register.
 pub fn init() {
     GDT.0.load();
     unsafe {

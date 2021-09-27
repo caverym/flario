@@ -9,22 +9,29 @@ extern crate alloc;
 use flario::kernel::task::executor::Executor;
 use flario::kernel::task::Task;
 use flario::*;
+// Defines entry point for the bootloader, bootloader defines_start function.
 entry_point!(main);
 
+/// The main entry point of the Flario kernel.
 fn main(boot_info: &'static BootInfo) -> ! {
+    // Initiate GDT, IDT, & PIC.
     init();
-    let mem_items = mem_init(&boot_info);
+    // Initiate memory
+    let _mem_items = mem_init(&boot_info);
+
+    // Create executor.
     let mut exe = Executor::new();
 
-    // exe.spawn(Task::new(kernel::task::keyboard::print_keypresses()));
+    // Adds tasks to executor.
     exe.spawn(Task::new(welcome()));
     exe.spawn(Task::new(shell::main::shell()));
 
+    // Runs the executor, it handles asynchronous tasks.
     exe.run();
-
-    panic!("end of main!");
 }
 
+
+/// Panic handler. Panics then halts the CPU indefinitely.
 #[cfg(not(test))]
 #[panic_handler]
 fn panic(info: &core::panic::PanicInfo) -> ! {
@@ -32,12 +39,14 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
     halt();
 }
 
+/// Test Panic handler. runs `test_panic_handler`
 #[cfg(test)]
 #[panic_handler]
 fn panic(info: &core::panic::PanicInfo) -> ! {
     fario::test_panic_handler(info)
 }
 
+/// Test allocation of memory
 #[test_case]
 fn simple_allocation() {
     use alloc::boxed::Box;
@@ -48,6 +57,7 @@ fn simple_allocation() {
     assert_eq!(*heapv2, 13);
 }
 
+/// Test allocation of large vector
 #[test_case]
 fn large_vec() {
     use alloc::vec::Vec;
@@ -60,6 +70,7 @@ fn large_vec() {
     assert_eq!(vec.iter().sum::<u64>(), (n - 1) * n / 2);
 }
 
+/// Test allocation of multiple boxes
 #[test_case]
 fn many_boxes() {
     use alloc::boxed::Box;
@@ -71,6 +82,7 @@ fn many_boxes() {
     }
 }
 
+/// Test VGA and Serial printing
 #[test_case]
 fn test_println() {
     vs_print!("basic boot print test");

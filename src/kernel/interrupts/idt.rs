@@ -82,7 +82,7 @@ extern "x86-interrupt" fn stack_seg_fault_handler(stack_frame: InterruptStackFra
     panic!("EXCEPTION: STACK SEGMENT FAULT:\n{:#?}", stack_frame);
 }
 
-extern "x86-interrupt" fn seg_not_present_handler(stack_frame: InterruptStackFrame, _: u64) {
+extern "x86-interrupt" fn seg_not_present_handler(_stack_frame: InterruptStackFrame, _: u64) {
     // vga_println!("EXCEPTION: SEGMENT NOT PRESENT:\n{:#?}", stack_frame);
 }
 
