@@ -1,0 +1,55 @@
+[package]
+name = "fario"
+authors = ["Avery Murray <caverym@disroot.org>"]
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+volatile = "0.2"
+spin = "0.5"
+x86_64 = "0.14"
+uart_16550 = "0.2"
+pic8259 = "0.10"
+pc-keyboard = "0.5"
+linked_list_allocator = "0.9"
+
+[dependencies.bootloader]
+version = "*"
+features = ["map_physical_memory"]
+
+[dependencies.lazy_static]
+version = "*"
+features = ["spin_no_std"]
+
+[dependencies.conquer-once]
+version = "*"
+default-features = false
+
+[dependencies.futures-util]
+version = "*"
+default-features = false
+features = ["alloc"]
+
+[dependencies.crossbeam-queue]
+version = "*"
+default-features = false
+features = ["alloc"]
+
+[package.metadata.bootimage]
+test-args = [
+    "-device", "isa-debug-exit,iobase=0xf4,iosize=0x04",
+    "-serial", "stdio",
+    "-display", "none",
+]
+test-success-exit-code = 33
+test-timeout = 300
+
+[[test]]
+name = "panic_test"
+harness = false
+
+[[test]]
+name = "stack_overflow"
+harness = false
