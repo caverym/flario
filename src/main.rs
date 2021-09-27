@@ -6,9 +6,9 @@
 
 extern crate alloc;
 
-use fario::kernel::task::executor::Executor;
-use fario::kernel::task::Task;
-use fario::*;
+use flario::kernel::task::executor::Executor;
+use flario::kernel::task::Task;
+use flario::*;
 entry_point!(main);
 
 fn main(boot_info: &'static BootInfo) -> ! {
