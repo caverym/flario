@@ -1,3 +1,5 @@
+mod fs;
 pub mod main;
-mod string;
 mod vector;
+mod command;
+mod string;

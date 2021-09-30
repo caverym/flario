@@ -61,7 +61,6 @@ pub enum Color {
 #[repr(transparent)]
 pub struct ColorCode(u8);
 
-
 impl ColorCode {
     /// Creates a new instance of `ColorCode` from foreground and background `Color` Enums.
     pub fn new(foreground: Color, background: Color) -> ColorCode {

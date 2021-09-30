@@ -15,7 +15,6 @@ pub use bootloader::{entry_point, BootInfo};
 #[cfg(test)]
 entry_point!(test_main_entry);
 
-
 pub mod drivers;
 pub mod kernel;
 pub mod shell;
@@ -38,7 +37,6 @@ pub fn init() {
     kernel::interrupts::idt::init();
     kernel::interrupts::pic::init();
 }
-
 
 /// The `mem_init` function initiates memory, heap, and the global allocator. Returns a Memory item struct.
 pub fn mem_init(boot_info: &'static BootInfo) -> kernel::mem::MemoryItems {
@@ -117,7 +115,7 @@ const FLARIO: &str = "\
 pub async fn welcome() {
     vga_println!(
         "{}\n\nversion {}-release by:\n{}",
-        flario,
+        FLARIO,
         env!("CARGO_PKG_VERSION"),
         env!("CARGO_PKG_AUTHORS"),
     );

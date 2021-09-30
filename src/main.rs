@@ -30,7 +30,6 @@ fn main(boot_info: &'static BootInfo) -> ! {
     exe.run();
 }
 
-
 /// Panic handler. Panics then halts the CPU indefinitely.
 #[cfg(not(test))]
 #[panic_handler]

@@ -37,7 +37,6 @@ impl Executor {
 
     /// Spawn a task, adds a task to the queue.
     pub fn spawn(&mut self, task: Task) {
-        dbg_vs_println!("spawning task: {}", task.id.0);
         let task_id = task.id;
         if self.tasks.insert(task.id, task).is_some() {
             panic!("task with same ID already in tasks");
@@ -62,9 +61,6 @@ impl Executor {
                 None => continue, // go to next ID in queue.
             };
 
-            // Debug print which task is running.
-            dbg_vs_println!("running ready task: {}", task.id.0);
-
             // get waker reference based on the task's ID
             let waker = waker_cache
                 .entry(task_id)
@@ -81,10 +77,7 @@ impl Executor {
                     waker_cache.remove(&task_id);
                 }
                 // Task is not complete, do nothing
-                Poll::Pending => {
-                    // debug print which task is pending
-                    dbg_vs_println!("task {} still pending", task.id.0)
-                }
+                Poll::Pending => {}
             }
         }
     }
@@ -99,8 +92,6 @@ impl Executor {
             // queue is empty, enable interrupts and halt the thread.
             enable_and_hlt();
         } else {
-            // queue is not empty, enable interrupts and returns.
-            dbg_vs_println!("exe queue not empty");
             interrupts::enable();
         }
     }
