@@ -1,6 +1,7 @@
 use lazy_static::lazy_static;
 use spin::Mutex;
 use volatile::Volatile;
+use x86_64::instructions::interrupts::without_interrupts;
 
 /*
 This is the VGA driver. Will print to the standard VGA buffer at 0xb8000.
@@ -20,6 +21,17 @@ macro_rules! vga_println {
 	($($arg:tt)*) => ($crate::vga_print!("{}\n", format_args!($($arg)*)));
 }
 
+/// Clear row
+#[macro_export]
+macro_rules! clear_row {
+    () => ($crate::drivers::io::vga::_clear_row());
+}
+
+#[macro_export]
+macro_rules! clear_screen {
+    () => ($crate::drivers::io::vga::_clear_screen());
+}
+
 /// The real function to print to the VGA buffer using WRITER.
 #[doc(hidden)]
 pub fn _print(args: core::fmt::Arguments) {
@@ -33,6 +45,21 @@ pub fn _print(args: core::fmt::Arguments) {
             .expect("printing to vga failed")
     });
 }
+
+#[doc(hidden)]
+pub fn _clear_row() {
+        WRITER
+            .lock()
+            .clear_row(BUFFER_HEIGHT-1)
+}
+
+#[doc(hidden)]
+pub fn _clear_screen() {
+    WRITER
+        .lock()
+        .clear_screen()
+}
+
 
 /// VGA Color — C like Enum to define VGA compatible colors.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -153,6 +180,12 @@ impl Writer {
         };
         for col in 0..BUFFER_WIDTH {
             self.buffer.chars[row][col].write(blank);
+        }
+    }
+
+    pub fn clear_screen(&mut self) {
+        for _ in 0..BUFFER_HEIGHT {
+            self.new_line()
         }
     }
 }

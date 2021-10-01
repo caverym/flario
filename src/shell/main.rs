@@ -42,19 +42,34 @@ impl Shell {
         }
     }
 
-    pub async fn input(&mut self) -> Vec<String> {
+    pub fn print_prompt(&self) {
         if self.code != 0 {
             vga_print!("[{}]", self.code);
         }
 
         vga_print!("{} ", self.prompt);
+    }
 
+    pub async fn input(&mut self) -> Vec<String> {
         let mut args: Vec<String> = Vec::new();
         let mut vc = Vec::new();
+
+        self.print_prompt();
 
         loop {
             // get each key
             match self.key().await {
+                Key::Backspace => {
+                    if vc.is_empty() {
+                        continue;
+                    } else {
+                        vc.remove(vc.len() - 1);
+                        crate::clear_row!();
+                        self.print_prompt();
+                        vc.iter().for_each(|c| vga_print!("{}", *c as char));
+                        continue;
+                    }
+                }
                 // gathers each character, prints it to VGA buffer, inserts it at the end of `bytes`.
                 Key::Char(c) => {
                     vga_print!("{}", c);
@@ -71,9 +86,6 @@ impl Shell {
                     let s = String::from_bytes(&vc);
                     args.insert(args.len(), s);
                     break;
-                }
-                Key::Backspace => {
-                    vc.remove(vc.len() - 1);
                 }
                 // Don't do anything, unknown key
                 Key::Other(_) => {}
@@ -100,13 +112,13 @@ impl Shell {
                         },
                         DecodedKey::Unicode(character) => match character {
                             '\n' => Key::Enter,
+                            '\u{8}' => Key::Backspace,
                             _ => Key::Char(character),
                         },
                     };
                 }
             }
         }
-
         Key::None
     }
 
@@ -122,6 +134,7 @@ impl Shell {
             CommandEN::Read => super::programs::read::main(cmd.args),
             CommandEN::Mkfile => super::programs::mkfile::main(cmd.args),
             CommandEN::Edit => 1,
+            CommandEN::Clear => { crate::clear_screen!(); 0 }
             CommandEN::NotFound(s) => not_found(s).await,
         }
     }
