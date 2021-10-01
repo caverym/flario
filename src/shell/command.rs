@@ -1,20 +1,23 @@
-use super::vector::Vec;
 use super::string::String;
+use super::vector::Vec;
 use crate::shell::string::ToString;
 use core::fmt::Formatter;
 
+#[derive(Clone)]
 pub struct Command {
     pub arg_zero: CommandEN,
     pub args: Vec<String>,
 }
 
+#[derive(Clone)]
 pub enum CommandEN {
     Help,
-    InitFs,
     About,
     Ls,
     Mkdir,
-    Cat,
+    Rmdir,
+    Debug,
+    Read,
     Mkfile,
     Edit,
     NotFound(String),
@@ -22,17 +25,20 @@ pub enum CommandEN {
 
 impl core::fmt::Display for CommandEN {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}",
+        write!(
+            f,
+            "{}",
             match self {
                 CommandEN::Help => "help",
-                CommandEN::InitFs => "initfs",
                 CommandEN::About => "about",
                 CommandEN::Ls => "ls",
                 CommandEN::Mkdir => "mkdir",
-                CommandEN::Cat => "cat",
+                CommandEN::Rmdir => "rmdir",
+                CommandEN::Debug => "debug",
+                CommandEN::Read => "read",
                 CommandEN::Mkfile => "mkfile",
                 CommandEN::Edit => "edit",
-                CommandEN::NotFound(_) => "not found"
+                CommandEN::NotFound(_) => "not found",
             }
         )
     }
@@ -44,11 +50,12 @@ impl From<String> for CommandEN {
         let s: &str = core::str::from_utf8(&bytes).unwrap_or("");
         match s {
             "help" => CommandEN::Help,
-            "initfs" => CommandEN::InitFs,
             "about" => CommandEN::About,
             "ls" => CommandEN::Ls,
             "mkdir" => CommandEN::Mkdir,
-            "cat" => CommandEN::Cat,
+            "rmdir" => CommandEN::Rmdir,
+            "debug" => CommandEN::Debug,
+            "read" => CommandEN::Read,
             "mkfile" => CommandEN::Mkfile,
             "edit" => CommandEN::Edit,
             _ => CommandEN::NotFound(s.to_string()),

@@ -1,5 +1,5 @@
-mod fs;
-pub mod main;
-mod vector;
 mod command;
-mod string;
+pub mod main;
+mod programs;
+pub mod string;
+pub mod vector;

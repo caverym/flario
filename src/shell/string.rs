@@ -1,8 +1,7 @@
 use super::vector::Vec;
 use core::fmt::Formatter;
-use core::slice::Split;
 
-#[derive(Debug, Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub struct String(Vec<u8>);
 
 impl String {
@@ -27,7 +26,10 @@ pub trait ToString {
     fn to_string(&self) -> String;
 }
 
-impl<T> ToString for T where T: core::fmt::Display {
+impl<T> ToString for T
+where
+    T: core::fmt::Display,
+{
     fn to_string(&self) -> String {
         let a = format_args!("{}", self).as_str().unwrap_or("");
         let bytes: Vec<u8> = a.bytes().collect();

@@ -2,7 +2,7 @@
 runner = "bootimage runner"
 
 [build]
-target = "x86_64-fario.json"
+target = "x86_64-flario.json"
 
 [unstable]
 build-std-features = ["compiler-builtins-mem"]

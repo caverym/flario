@@ -1,35 +1,27 @@
-use crate::{vga_println, vga_print};
-use pc_keyboard::{Keyboard, ScancodeSet1, layouts, HandleControl, KeyCode, DecodedKey};
-use pc_keyboard::layouts::Us104Key;
-use crate::kernel::task::keyboard::ScancodeStream;
-use super::fs::Filesystem;
-use super::vector::Vec;
 use super::string::String;
+use super::vector::Vec;
+use crate::kernel::task::keyboard::ScancodeStream;
 use crate::shell::command::{Command, CommandEN};
+use crate::{vga_print, vga_println};
 use futures_util::StreamExt;
-use crate::shell::string::ToString;
+use pc_keyboard::{layouts::Us104Key, DecodedKey, HandleControl, KeyCode, Keyboard, ScancodeSet1};
 
 struct Shell {
     keyboard: Keyboard<Us104Key, ScancodeSet1>,
     scancodes: ScancodeStream,
     code: i32,
     prompt: char,
-    filesystem: Option<Filesystem>,
     last: Option<Command>,
 }
 
 impl Shell {
-    pub fn new(
-        keyboard: Keyboard<Us104Key, ScancodeSet1>,
-        scancodes: ScancodeStream,
-    ) -> Shell {
+    pub fn new(keyboard: Keyboard<Us104Key, ScancodeSet1>, scancodes: ScancodeStream) -> Shell {
         Shell {
             keyboard,
             scancodes,
             code: 0,
             prompt: '>',
-            filesystem: None,
-            last: None
+            last: None,
         }
     }
 
@@ -46,7 +38,7 @@ impl Shell {
                 args,
             };
 
-           self.exe(cmd).await;
+            self.exe(cmd).await;
         }
     }
 
@@ -79,8 +71,10 @@ impl Shell {
                     let s = String::from_bytes(&vc);
                     args.insert(args.len(), s);
                     break;
-                },
-                Key::Backspace => { vc.remove(vc.len() - 1); },
+                }
+                Key::Backspace => {
+                    vc.remove(vc.len() - 1);
+                }
                 // Don't do anything, unknown key
                 Key::Other(_) => {}
                 // Don't do anything, no key
@@ -100,17 +94,15 @@ impl Shell {
                 if let Some(key) = self.keyboard.process_keyevent(key_event) {
                     // matches which key was pressed and translates into `Key`
                     return match key {
-                        DecodedKey::RawKey(key) => {
-                            match key {
-                                KeyCode::Backspace => Key::Backspace,
-                                _ => Key::Other(key),
-                            }
+                        DecodedKey::RawKey(key) => match key {
+                            KeyCode::Backspace => Key::Backspace,
+                            _ => Key::Other(key),
                         },
                         DecodedKey::Unicode(character) => match character {
                             '\n' => Key::Enter,
                             _ => Key::Char(character),
                         },
-                    }
+                    };
                 }
             }
         }
@@ -119,15 +111,16 @@ impl Shell {
     }
 
     pub async fn exe(&mut self, cmd: Command) {
-        vga_println!("executing {}", cmd.arg_zero);
+        self.last = Some(cmd.clone());
         self.code = match cmd.arg_zero {
-            CommandEN::Help => help(cmd.args).await,
-            CommandEN::InitFs => 1,
+            CommandEN::Help => super::programs::help::main(cmd.args).await,
             CommandEN::About => 1,
-            CommandEN::Ls => 1,
-            CommandEN::Mkdir => 1,
-            CommandEN::Cat => 1,
-            CommandEN::Mkfile => 1,
+            CommandEN::Ls => super::programs::ls::main(cmd.args),
+            CommandEN::Mkdir => super::programs::mkdir::main(cmd.args),
+            CommandEN::Rmdir => super::programs::rmdir::main(cmd.args),
+            CommandEN::Debug => super::programs::debug::main(cmd.args),
+            CommandEN::Read => super::programs::read::main(cmd.args),
+            CommandEN::Mkfile => super::programs::mkfile::main(cmd.args),
             CommandEN::Edit => 1,
             CommandEN::NotFound(s) => not_found(s).await,
         }
@@ -135,15 +128,16 @@ impl Shell {
 }
 
 pub async fn shell() {
+    vga_println!("{}!", String::from_bytes(b"flario shell"));
     // Initiate scancode stream
-    let mut scancodes = ScancodeStream::new();
+    let scancodes = ScancodeStream::new();
     // Create keyboard handle
-    let mut keyboard = Keyboard::new(Us104Key, ScancodeSet1, HandleControl::Ignore);
+    let keyboard = Keyboard::new(Us104Key, ScancodeSet1, HandleControl::Ignore);
 
     let mut shell = Shell::new(keyboard, scancodes);
     shell.run().await;
 
-    vga_println!("Exiting Fario shell");
+    vga_println!("Exiting flario shell");
 }
 
 enum Key {
@@ -157,17 +151,4 @@ enum Key {
 async fn not_found(s: String) -> i32 {
     vga_println!("Command not found: {}", s);
     1
-}
-
-async fn help(args: Vec<String>) -> i32 {
-    if args.len() > 0 {
-        for arg in args {
-            vga_println!("{}", arg);
-        }
-    } else {
-        vga_println!("HELP NOT IMPLEMENTED");
-        return 1;
-    }
-
-    0
 }
