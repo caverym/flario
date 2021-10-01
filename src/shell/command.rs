@@ -21,6 +21,7 @@ pub enum CommandEN {
     Clear,
     Mkfile,
     Edit,
+    Logo,
     NotFound(String),
 }
 
@@ -40,6 +41,7 @@ impl core::fmt::Display for CommandEN {
                 CommandEN::Read => "read",
                 CommandEN::Mkfile => "mkfile",
                 CommandEN::Edit => "edit",
+                CommandEN::Logo => "logo",
                 CommandEN::NotFound(_) => "not found",
             }
         )
@@ -61,6 +63,7 @@ impl From<String> for CommandEN {
             "read" => CommandEN::Read,
             "mkfile" => CommandEN::Mkfile,
             "edit" => CommandEN::Edit,
+            "logo" => CommandEN::Logo,
             _ => CommandEN::NotFound(s.to_string()),
         }
     }

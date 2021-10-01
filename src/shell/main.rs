@@ -135,6 +135,7 @@ impl Shell {
             CommandEN::Mkfile => super::programs::mkfile::main(cmd.args),
             CommandEN::Edit => 1,
             CommandEN::Clear => { crate::clear_screen!(); 0 }
+            CommandEN::Logo => super::programs::logo::main(cmd.args),
             CommandEN::NotFound(s) => not_found(s).await,
         }
     }
