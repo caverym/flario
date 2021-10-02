@@ -47,6 +47,16 @@ impl File {
 #[derive(Debug)]
 pub struct Directory(BTreeMap<String, Node>);
 
+impl Directory {
+    pub fn list_node(&self) -> Vec<(&String, &Node)> {
+        let mut vd: Vec<(&String, &Node)> = Vec::new();
+        for n in &self.0 {
+            vd.insert(vd.len(), n)
+        }
+        vd
+    }
+}
+
 #[derive(Debug)]
 pub struct Node {
     directory: Option<Directory>,
@@ -75,6 +85,14 @@ impl Node {
 
     pub fn is_both(&self) -> bool {
         self.is_directory() && self.is_file()
+    }
+
+    pub fn as_directory(&self) -> &Option<Directory> {
+        &self.directory
+    }
+
+    pub fn as_file(&self) -> &Option<File> {
+        &self.file
     }
 }
 
