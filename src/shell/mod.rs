@@ -1,4 +1,5 @@
 mod command;
+mod environ;
 pub mod main;
 mod programs;
 pub mod string;

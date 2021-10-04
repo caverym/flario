@@ -1,4 +1,5 @@
 pub mod debug;
+pub mod env;
 pub mod help;
 pub mod logo;
 pub mod ls;
@@ -30,6 +31,10 @@ mod includes {
     }
 
     pub mod fs {
-        pub use crate::kernel::fs::FILESYSTEM;
+        pub use crate::kernel::fs::{Node, FILESYSTEM};
+    }
+
+    pub mod env {
+        pub use crate::shell::environ::{Environment, Key, ENVIRON};
     }
 }

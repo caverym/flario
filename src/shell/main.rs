@@ -74,7 +74,10 @@ impl Shell {
                 Key::Char(c) => {
                     vga_print!("{}", c);
                     if c == ' ' {
-                        args.insert(args.len(), String::from_utf8(vc).unwrap_or(Default::default()));
+                        args.insert(
+                            args.len(),
+                            String::from_utf8(vc).unwrap_or(Default::default()),
+                        );
                         vc = Vec::new();
                     } else {
                         vc.insert(vc.len(), c as u8);
@@ -134,6 +137,7 @@ impl Shell {
             CommandEN::Debug => super::programs::debug::main(cmd.args),
             CommandEN::Read => super::programs::read::main(cmd.args),
             CommandEN::Mkfile => super::programs::mkfile::main(cmd.args),
+            CommandEN::Env => super::programs::env::main(cmd.args),
             CommandEN::Edit => 1,
             CommandEN::Clear => {
                 crate::clear_screen!();
