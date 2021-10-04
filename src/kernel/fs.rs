@@ -102,7 +102,7 @@ impl Filesystem {
     }
 
     fn write_readme(&mut self) {
-        let readme: String = String::from_bytes(b"readme");
+        let readme: String = String::from_utf8(b"readme".to_vec()).unwrap_or(Default::default());
         self.create_file(readme.clone());
         self.write_to_file(
             readme,

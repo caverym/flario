@@ -1,5 +1,4 @@
 use core::fmt::{Display, Formatter};
-use core::str::FromStr;
 crate::include_lib!(std, io);
 
 enum Item {
@@ -20,13 +19,10 @@ impl Display for Item {
 
 impl Item {
     pub fn from_string(s: &String) -> Result<Self, ()> {
-        if let Some(s) = core::str::from_utf8(&*s.bytes()).ok() {
-            return match s {
+            return match s.as_str() {
                 "filesystem" => Ok(Self::FileSystem),
                 _ => Err(()),
             };
-        }
-        Err(())
     }
 }
 

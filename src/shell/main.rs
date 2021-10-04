@@ -74,7 +74,7 @@ impl Shell {
                 Key::Char(c) => {
                     vga_print!("{}", c);
                     if c == ' ' {
-                        args.insert(args.len(), String::from_bytes(&vc));
+                        args.insert(args.len(), String::from_utf8(vc).unwrap_or(Default::default()));
                         vc = Vec::new();
                     } else {
                         vc.insert(vc.len(), c as u8);
@@ -83,7 +83,7 @@ impl Shell {
                 // enter, returns the function
                 Key::Enter => {
                     vga_println!();
-                    let s = String::from_bytes(&vc);
+                    let s = String::from_utf8(vc).unwrap_or(Default::default());
                     args.insert(args.len(), s);
                     break;
                 }

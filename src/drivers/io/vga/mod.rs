@@ -40,7 +40,6 @@ macro_rules! clear_screen {
 #[doc(hidden)]
 pub fn _print(args: core::fmt::Arguments) {
     use core::fmt::Write;
-    use x86_64::instructions::interrupts::without_interrupts;
 
     without_interrupts(|| {
         WRITER
@@ -53,8 +52,8 @@ pub fn _print(args: core::fmt::Arguments) {
 #[doc(hidden)]
 pub fn _clear_row() {
     let mut wt = WRITER.lock();
-    wt.lock().clear_row(BUFFER_HEIGHT - 1);
-    wt.lock().column_position = 0;
+    wt.clear_row(BUFFER_HEIGHT - 1);
+    wt.column_position = 0;
 }
 
 #[doc(hidden)]

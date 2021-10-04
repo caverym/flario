@@ -1,7 +1,7 @@
 crate::include_lib!(std, io, fs);
 
 pub fn main(args: Vec<String>) -> i32 {
-    let mut fs = FILESYSTEM.lock();
+    let fs = FILESYSTEM.lock();
     let mut code = 0;
     for arg in args {
         let (c, data) = fs.read_file(arg.clone());

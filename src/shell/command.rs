@@ -52,7 +52,7 @@ impl core::fmt::Display for CommandEN {
 
 impl From<String> for CommandEN {
     fn from(s: String) -> Self {
-        let bytes: Vec<u8> = s.bytes();
+        let bytes: Vec<u8> = s.as_bytes().to_vec();
         let s: &str = core::str::from_utf8(&bytes).unwrap_or("");
         match s {
             "help" => CommandEN::Help,

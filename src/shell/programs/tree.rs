@@ -44,11 +44,11 @@ fn indentation_from_level(level: &i32) {
 
     while &i < level {
         i += 1;
-        let mut bytes = line.bytes();
+        let mut bytes = line.as_bytes().to_vec();
         for _ in 0..4 {
             bytes.push(b' ');
         }
-        line = String::from_bytes(bytes.as_slice());
+        line = String::from_utf8(bytes).unwrap_or(Default::default())
     }
 
     vga_print!("{}", line);

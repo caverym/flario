@@ -1,3 +1,7 @@
+pub use alloc::string::String;
+pub use alloc::string::ToString;
+
+/*
 use super::vector::Vec;
 use core::fmt::Formatter;
 
@@ -43,3 +47,4 @@ impl core::fmt::Display for String {
         write!(f, "{}", str)
     }
 }
+*/
