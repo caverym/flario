@@ -128,6 +128,7 @@ impl Shell {
             CommandEN::Help => super::programs::help::main(cmd.args).await,
             CommandEN::About => 1,
             CommandEN::Ls => super::programs::ls::main(cmd.args),
+            CommandEN::Tree => super::programs::tree::main(cmd.args),
             CommandEN::Mkdir => super::programs::mkdir::main(cmd.args),
             CommandEN::Rmdir => super::programs::rmdir::main(cmd.args),
             CommandEN::Debug => super::programs::debug::main(cmd.args),

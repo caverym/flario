@@ -6,6 +6,7 @@ pub mod mkfile;
 pub mod rmdir;
 pub mod read;
 pub mod logo;
+pub mod tree;
 
 #[macro_export]
 macro_rules! include_lib {
