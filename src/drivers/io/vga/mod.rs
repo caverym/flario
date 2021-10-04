@@ -52,7 +52,8 @@ pub fn _print(args: core::fmt::Arguments) {
 
 #[doc(hidden)]
 pub fn _clear_row() {
-    WRITER.lock().clear_row(BUFFER_HEIGHT - 1)
+    WRITER.lock().clear_row(BUFFER_HEIGHT - 1);
+    WRITER.lock().column_position = 0;
 }
 
 #[doc(hidden)]
