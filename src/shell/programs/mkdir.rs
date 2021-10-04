@@ -5,7 +5,7 @@ pub fn main(args: Vec<String>) -> i32 {
     for d in args {
         vga_println!("creating directory: '{}'", d);
         let code = fs.create_dir(d);
-        return code  as i32;
+        return code as i32;
     }
     0
 }

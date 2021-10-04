@@ -24,12 +24,16 @@ macro_rules! vga_println {
 /// Clear row
 #[macro_export]
 macro_rules! clear_row {
-    () => ($crate::drivers::io::vga::_clear_row());
+    () => {
+        $crate::drivers::io::vga::_clear_row()
+    };
 }
 
 #[macro_export]
 macro_rules! clear_screen {
-    () => ($crate::drivers::io::vga::_clear_screen());
+    () => {
+        $crate::drivers::io::vga::_clear_screen()
+    };
 }
 
 /// The real function to print to the VGA buffer using WRITER.
@@ -48,18 +52,13 @@ pub fn _print(args: core::fmt::Arguments) {
 
 #[doc(hidden)]
 pub fn _clear_row() {
-        WRITER
-            .lock()
-            .clear_row(BUFFER_HEIGHT-1)
+    WRITER.lock().clear_row(BUFFER_HEIGHT - 1)
 }
 
 #[doc(hidden)]
 pub fn _clear_screen() {
-    WRITER
-        .lock()
-        .clear_screen()
+    WRITER.lock().clear_screen()
 }
-
 
 /// VGA Color — C like Enum to define VGA compatible colors.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

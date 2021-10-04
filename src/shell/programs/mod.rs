@@ -1,11 +1,11 @@
 pub mod debug;
 pub mod help;
+pub mod logo;
 pub mod ls;
 pub mod mkdir;
 pub mod mkfile;
-pub mod rmdir;
 pub mod read;
-pub mod logo;
+pub mod rmdir;
 pub mod tree;
 
 #[macro_export]
