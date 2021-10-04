@@ -142,7 +142,7 @@ impl Shell {
 }
 
 pub async fn shell() {
-    vga_println!("{}!", String::from_bytes(b"flario shell"));
+    vga_println!("Flario shell");
     // Initiate scancode stream
     let scancodes = ScancodeStream::new();
     // Create keyboard handle
