@@ -86,6 +86,10 @@ impl Shell {
                 // enter, returns the function
                 Key::Enter => {
                     vga_println!();
+                    if vc.is_empty() {
+                        self.print_prompt();
+                        continue;
+                    }
                     let s = String::from_utf8(vc).unwrap_or(Default::default());
                     args.insert(args.len(), s);
                     break;
