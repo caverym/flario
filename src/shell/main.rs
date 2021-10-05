@@ -2,18 +2,16 @@ use super::string::String;
 use super::vector::Vec;
 use crate::kernel::status::Status;
 use crate::kernel::task::keyboard::ScancodeStream;
-use crate::shell::command::{Command, CommandEN};
+use crate::shell::command::Command;
 use crate::{vga_print, vga_println};
 use futures_util::StreamExt;
 use pc_keyboard::{layouts::Us104Key, DecodedKey, HandleControl, KeyCode, Keyboard, ScancodeSet1};
-use crate::shell::program::Program;
 
 struct Shell {
     keyboard: Keyboard<Us104Key, ScancodeSet1>,
     scancodes: ScancodeStream,
     code: Status,
     prompt: char,
-    last: Option<Command>,
 }
 
 impl Shell {
@@ -23,13 +21,12 @@ impl Shell {
             scancodes,
             code: Status::Success,
             prompt: '>',
-            last: None,
         }
     }
 
     pub async fn run(&mut self) {
         loop {
-            let mut args = self.input().await;
+            let args = self.input().await;
 
             if args.is_empty() {
                 continue;
@@ -147,9 +144,4 @@ enum Key {
     Backspace,
     Other(KeyCode),
     None,
-}
-
-fn not_found(s: String) -> Status {
-    vga_println!("Command not found: {}", s);
-    Status::NotFound
 }

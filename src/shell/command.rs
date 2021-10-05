@@ -1,12 +1,10 @@
 use super::string::String;
 use super::vector::Vec;
-use crate::shell::string::ToString;
-use core::fmt::Formatter;
 use crate::kernel::status::Status;
-use core::future::Future;
-use core::pin::Pin;
-use alloc::boxed::Box;
 use crate::shell::program::Program;
+use alloc::boxed::Box;
+use core::fmt::Formatter;
+use core::pin::Pin;
 
 pub struct Command {
     pub arg_zero: CommandEN,

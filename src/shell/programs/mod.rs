@@ -1,17 +1,17 @@
+pub mod about;
+pub mod clear;
 pub mod debug;
+pub mod edit;
 pub mod env;
 pub mod help;
 pub mod logo;
 pub mod ls;
 pub mod mkdir;
 pub mod mkfile;
+pub mod not_found;
 pub mod read;
 pub mod rmdir;
 pub mod tree;
-pub mod about;
-pub mod clear;
-pub mod edit;
-pub mod not_found;
 
 #[macro_export]
 macro_rules! include_lib {
@@ -42,7 +42,7 @@ mod includes {
     }
 
     pub mod io {
-        pub use crate::{vga_print, vga_println, clear_row, clear_screen};
+        pub use crate::{clear_row, clear_screen, vga_print, vga_println};
     }
 
     pub mod fs {
