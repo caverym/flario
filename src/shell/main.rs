@@ -73,10 +73,7 @@ impl Shell {
                 Key::Char(c) => {
                     vga_print!("{}", c);
                     if c == ' ' {
-                        args.insert(
-                            args.len(),
-                            String::from_utf8(vc).unwrap_or_default(),
-                        );
+                        args.insert(args.len(), String::from_utf8(vc).unwrap_or_default());
                         vc = Vec::new();
                     } else {
                         vc.insert(vc.len(), c as u8);

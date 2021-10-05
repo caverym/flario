@@ -67,9 +67,9 @@ impl Executor {
             };
 
             // get waker reference based on the task's ID
-            let waker = waker_cache
-                .entry(task_id)
-                .or_insert_with(|| Waker::from(Arc::new(TaskWaker::new(task_id, task_queue.clone()))));
+            let waker = waker_cache.entry(task_id).or_insert_with(|| {
+                Waker::from(Arc::new(TaskWaker::new(task_id, task_queue.clone())))
+            });
 
             // Get the Task's context.
             let mut context = Context::from_waker(waker);
