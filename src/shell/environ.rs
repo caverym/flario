@@ -8,8 +8,9 @@ use spin::Mutex;
 lazy_static! {
     pub static ref ENVIRON: Mutex<Environment> = {
         let mut env = Environment::new();
-        env.add("cwd".to_string(), "/".to_string())
-            .expect("failed to initialize env");
+        assert_eq!(env.add("cwd", "/")
+            .expect("failed to initialize env"),
+            0);
         Mutex::new(env)
     };
 }
@@ -28,14 +29,7 @@ impl Key {
 
 impl Display for Key {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        let mut str = "";
-        let tab = " = ";
-
-        str = format_args!("{}{}{}{}\n", str, self.name, tab, self.value)
-            .as_str()
-            .unwrap_or(str);
-
-        write!(f, "{}", str)
+        write!(f, "{}  =  {}", self.name, self.value)
     }
 }
 
@@ -61,8 +55,8 @@ impl Environment {
         false
     }
 
-    pub fn add(&mut self, name: String, value: String) -> Result<usize, u8> {
-        let key: Key = Key::new(name, value);
+    pub fn add(&mut self, name: &str, value: &str) -> Result<usize, u8> {
+        let key: Key = Key::new(name.to_string(), value.to_string());
 
         if self.contains_key(&key) || self.contains_entry(&key.name) {
             return Err(1);

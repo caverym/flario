@@ -1,7 +1,6 @@
 pub mod about;
 pub mod clear;
 pub mod debug;
-pub mod edit;
 pub mod env;
 pub mod help;
 pub mod logo;
