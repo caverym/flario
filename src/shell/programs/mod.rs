@@ -8,6 +8,10 @@ pub mod mkfile;
 pub mod read;
 pub mod rmdir;
 pub mod tree;
+pub mod about;
+pub mod clear;
+pub mod edit;
+pub mod not_found;
 
 #[macro_export]
 macro_rules! include_lib {
@@ -38,7 +42,7 @@ mod includes {
     }
 
     pub mod io {
-        pub use crate::{vga_print, vga_println};
+        pub use crate::{vga_print, vga_println, clear_row, clear_screen};
     }
 
     pub mod fs {

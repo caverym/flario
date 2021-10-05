@@ -6,6 +6,7 @@ use crate::shell::command::{Command, CommandEN};
 use crate::{vga_print, vga_println};
 use futures_util::StreamExt;
 use pc_keyboard::{layouts::Us104Key, DecodedKey, HandleControl, KeyCode, Keyboard, ScancodeSet1};
+use crate::shell::program::Program;
 
 struct Shell {
     keyboard: Keyboard<Us104Key, ScancodeSet1>,
@@ -34,10 +35,7 @@ impl Shell {
                 continue;
             }
 
-            let cmd = Command {
-                arg_zero: args.remove(0).into(),
-                args,
-            };
+            let cmd: Command = args.into();
 
             self.exe(cmd).await;
         }
@@ -126,26 +124,7 @@ impl Shell {
     }
 
     pub async fn exe(&mut self, cmd: Command) {
-        self.last = Some(cmd.clone());
-        self.code = match cmd.arg_zero {
-            CommandEN::Help => super::programs::help::main(cmd.args).await,
-            CommandEN::About => Status::NotFound,
-            CommandEN::Ls => super::programs::ls::main(cmd.args),
-            CommandEN::Tree => super::programs::tree::main(cmd.args),
-            CommandEN::Mkdir => super::programs::mkdir::main(cmd.args),
-            CommandEN::Rmdir => super::programs::rmdir::main(cmd.args),
-            CommandEN::Debug => super::programs::debug::main(cmd.args),
-            CommandEN::Read => super::programs::read::main(cmd.args),
-            CommandEN::Mkfile => super::programs::mkfile::main(cmd.args),
-            CommandEN::Env => super::programs::env::main(cmd.args),
-            CommandEN::Edit => Status::NotFound,
-            CommandEN::Clear => {
-                crate::clear_screen!();
-                Status::Success
-            }
-            CommandEN::Logo => super::programs::logo::main(cmd.args),
-            CommandEN::NotFound(s) => not_found(s),
-        }
+        self.code = cmd.execute();
     }
 }
 

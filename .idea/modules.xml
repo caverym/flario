@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/fario.iml" filepath="$PROJECT_DIR$/fario.iml" />
+      <module fileurl="file://$PROJECT_DIR$/flario.iml" filepath="$PROJECT_DIR$/flario.iml" />
     </modules>
   </component>
 </project>

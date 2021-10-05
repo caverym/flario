@@ -2,11 +2,50 @@ use super::string::String;
 use super::vector::Vec;
 use crate::shell::string::ToString;
 use core::fmt::Formatter;
+use crate::kernel::status::Status;
+use core::future::Future;
+use core::pin::Pin;
+use alloc::boxed::Box;
+use crate::shell::program::Program;
 
-#[derive(Clone)]
 pub struct Command {
     pub arg_zero: CommandEN,
     pub args: Vec<String>,
+    func: Pin<Box<dyn Program>>,
+}
+
+impl Command {
+    pub fn execute(self) -> Status {
+        self.func.run(self.args)
+    }
+}
+
+impl From<Vec<String>> for Command {
+    fn from(mut args: Vec<String>) -> Self {
+        let arg_zero: CommandEN = args.remove(0).into();
+        let func = Pin::new(Box::new(match arg_zero {
+            CommandEN::Help => super::programs::help::main,
+            CommandEN::About => super::programs::about::main,
+            CommandEN::Ls => super::programs::ls::main,
+            CommandEN::Tree => super::programs::tree::main,
+            CommandEN::Mkdir => super::programs::mkdir::main,
+            CommandEN::Rmdir => super::programs::rmdir::main,
+            CommandEN::Debug => super::programs::debug::main,
+            CommandEN::Read => super::programs::read::main,
+            CommandEN::Clear => super::programs::clear::main,
+            CommandEN::Mkfile => super::programs::mkfile::main,
+            CommandEN::Env => super::programs::env::main,
+            CommandEN::Edit => super::programs::edit::main,
+            CommandEN::Logo => super::programs::logo::main,
+            CommandEN::NotFound => super::programs::not_found::main,
+        }));
+
+        Self {
+            arg_zero,
+            args,
+            func,
+        }
+    }
 }
 
 #[derive(Clone)]
@@ -24,7 +63,7 @@ pub enum CommandEN {
     Env,
     Edit,
     Logo,
-    NotFound(String),
+    NotFound,
 }
 
 impl core::fmt::Display for CommandEN {
@@ -46,7 +85,7 @@ impl core::fmt::Display for CommandEN {
                 CommandEN::Edit => "edit",
                 CommandEN::Logo => "logo",
                 CommandEN::Env => "env",
-                CommandEN::NotFound(_) => "not found",
+                CommandEN::NotFound => "not found",
             }
         )
     }
@@ -70,7 +109,7 @@ impl From<String> for CommandEN {
             "edit" => CommandEN::Edit,
             "logo" => CommandEN::Logo,
             "env" => CommandEN::Env,
-            _ => CommandEN::NotFound(s.to_string()),
+            _ => CommandEN::NotFound,
         }
     }
 }
