@@ -1,17 +1,16 @@
-use crate::kernel::fs::Node;
 crate::include_lib!(std, io, fs);
 
-pub fn main(_: Vec<String>) -> i32 {
+pub fn main(_: Vec<String>) -> Status {
     let fs = FILESYSTEM.lock();
     vga_println!(".");
     let level = 1;
     for (name, node) in fs.list_node() {
         tree_func(name, node, level);
     }
-    0
+    Status::Success
 }
 
-fn tree_func(name: &String, node: &Node, mut level: i32) -> i32 {
+fn tree_func(name: &str, node: &Node, mut level: i32) -> i32 {
     indentation_from_level(&level);
     if node.is_directory() {
         vga_println!("dir: {}", name);
@@ -45,10 +44,8 @@ fn indentation_from_level(level: &i32) {
     while &i < level {
         i += 1;
         let mut bytes = line.as_bytes().to_vec();
-        for _ in 0..4 {
-            bytes.push(b' ');
-        }
-        line = String::from_utf8(bytes).unwrap_or(Default::default())
+        bytes.append(&mut [b' '; 4].to_vec());
+        line = String::from_utf8(bytes).unwrap_or_default();
     }
 
     vga_print!("{}", line);

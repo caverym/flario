@@ -16,6 +16,12 @@ pub struct Executor {
     waker_cache: BTreeMap<TaskId, Waker>,
 }
 
+impl Default for Executor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Executor {
     /// Creates an empty Executor
     pub fn new() -> Self {
@@ -63,7 +69,7 @@ impl Executor {
             // get waker reference based on the task's ID
             let waker = waker_cache
                 .entry(task_id)
-                .or_insert_with(|| TaskWaker::new(task_id, task_queue.clone()));
+                .or_insert_with(|| Waker::from(Arc::new(TaskWaker::new(task_id, task_queue.clone()))));
 
             // Get the Task's context.
             let mut context = Context::from_waker(waker);
@@ -104,11 +110,11 @@ struct TaskWaker {
 
 impl TaskWaker {
     /// Create a new TaskWaker with a task's ID and queue.
-    fn new(task_id: TaskId, task_queue: Arc<ArrayQueue<TaskId>>) -> Waker {
-        Waker::from(Arc::new(TaskWaker {
+    fn new(task_id: TaskId, task_queue: Arc<ArrayQueue<TaskId>>) -> TaskWaker {
+        TaskWaker {
             task_id,
             task_queue,
-        }))
+        }
     }
 
     // wake the task

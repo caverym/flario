@@ -52,7 +52,7 @@ impl Environment {
         self.0.contains(key)
     }
 
-    pub fn contains_entry(&self, key: &String) -> bool {
+    pub fn contains_entry(&self, key: &str) -> bool {
         for k in &self.0 {
             if k.name == *key {
                 return true;

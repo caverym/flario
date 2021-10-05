@@ -6,6 +6,7 @@
 #![feature(const_mut_refs)]
 #![test_runner(crate::test_runner)]
 #![reexport_test_harness_main = "test_main"]
+#![allow(clippy::missing_safety_doc)]
 
 extern crate alloc;
 
@@ -46,14 +47,14 @@ pub fn mem_init(boot_info: &'static BootInfo) -> kernel::mem::MemoryItems {
 /// Teastable trait, trait to run code tests
 pub trait Testable {
     /// Run function for code tests.
-    fn run(&self) -> ();
+    fn run(&self);
 }
 
 impl<T> Testable for T
 where
     T: Fn(),
 {
-    fn run(&self) -> () {
+    fn run(&self) {
         vs_print!("{}...\t", core::any::type_name::<T>());
         self();
         vs_println!("[OK]")

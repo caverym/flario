@@ -1,21 +1,18 @@
 crate::include_lib!(std, io, fs);
 
-pub fn main(args: Vec<String>) -> i32 {
+pub fn main(args: Vec<String>) -> Status {
     let mut fs = FILESYSTEM.lock();
-    let mut code = 0;
+    let mut code = Status::Success;
     for arg in args {
-        code = fs.create_file(arg.clone()) as usize;
+        code = fs.create_file(arg.clone());
         match code {
-            0 => {}
-            1 => {
+            Status::AlreadyExists => {
                 vga_println!("Error: file {} already exists", arg);
-                return code as i32;
             }
             _ => {
                 vga_println!("Error: unknown error: {}", code);
-                return code as i32;
             }
         }
     }
-    code as i32
+    code
 }

@@ -5,7 +5,6 @@ use core::sync::atomic::{AtomicU64, Ordering};
 
 pub mod executor;
 pub mod keyboard;
-pub mod simple_executor;
 
 /// Structure for Task IDs
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

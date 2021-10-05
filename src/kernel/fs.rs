@@ -1,8 +1,11 @@
+use crate::kernel::status::Status;
 use crate::shell::string::String;
 use alloc::collections::BTreeMap;
 use alloc::prelude::v1::Vec;
 use lazy_static::lazy_static;
 use spin::Mutex;
+use alloc::string::ToString;
+use alloc::collections::btree_map::Entry;
 
 lazy_static! {
     pub static ref FILESYSTEM: Mutex<Filesystem> = {
@@ -19,6 +22,11 @@ pub struct Filesystem(BTreeMap<String, Node>);
 pub struct File {
     position: usize,
     data: Vec<u8>,
+}
+
+pub struct FileRead {
+    pub len: usize,
+    pub data: Vec<u8>,
 }
 
 impl File {
@@ -39,8 +47,11 @@ impl File {
         count
     }
 
-    pub fn read(&self) -> (usize, Vec<u8>) {
-        (self.data.len(), self.data.clone())
+    pub fn read(&self) -> FileRead {
+        FileRead {
+            len: self.data.len(),
+            data: self.data.clone(),
+        }
     }
 }
 
@@ -96,13 +107,19 @@ impl Node {
     }
 }
 
+impl Default for Filesystem {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Filesystem {
     pub fn new() -> Filesystem {
         Filesystem(BTreeMap::new())
     }
 
     fn write_readme(&mut self) {
-        let readme: String = String::from_utf8(b"readme".to_vec()).unwrap_or(Default::default());
+        let readme: String = "readme".to_string();
         self.create_file(readme.clone());
         self.write_to_file(
             readme,
@@ -120,51 +137,59 @@ Thank you!
         );
     }
 
-    pub fn write_to_file(&mut self, name: String, data: Vec<u8>) -> u8 {
+    pub fn write_to_file(&mut self, name: String, data: Vec<u8>) -> Status {
         if let Some(node) = self.0.get_mut(&name) {
             if let Some(ref mut f) = node.file {
                 let code = f.write(&data);
                 if code != data.len() {
                     // failed to write all requested bytes
-                    3
+                    Status::FailedToWrite
                 } else {
-                    0
+                    Status::Success
                 }
             } else {
                 // not a file
-                2
+                Status::WrongType
             }
         } else {
             // File does not exist
-            1
+            Status::NotFound
         }
     }
 
-    pub fn create_file(&mut self, name: String) -> u8 {
-        if self.0.contains_key(&name) {
-            return 1;
+    pub fn create_file(&mut self, name: String) -> Status {
+        /*if self.0.contains_key(&name) {
+            Status::AlreadyExists
         } else {
             let mut file = Node::new();
             file.file = Some(File::new());
             self.0.insert(name, file);
-            0
+            Status::Success
+        }*/
+        if let Entry::Vacant(e) = self.0.entry(name) {
+            let mut file = Node::new();
+            file.file = Some(File::new());
+            e.insert(file);
+            Status::Success
+        } else {
+            Status::AlreadyExists
         }
     }
 
-    pub fn remove_file(&mut self, name: String) -> u8 {
+    pub fn remove_file(&mut self, name: String) -> Status {
         if let Some(node) = self.0.get(&name) {
             if let Some(f) = &node.file {
                 if f.data.is_empty() {
                     self.0.remove_entry(&name);
-                    0
+                    Status::Success
                 } else {
-                    3
+                    Status::FailedToWrite
                 }
             } else {
-                2
+                Status::WrongType
             }
         } else {
-            1
+            Status::NotFound
         }
     }
 
@@ -176,29 +201,29 @@ Thank you!
         vd
     }
 
-    pub fn create_dir(&mut self, name: String) -> u8 {
-        if self.0.contains_key(&name) {
-            1
+    pub fn create_dir(&mut self, name: &str) -> Status {
+        if self.0.contains_key(name) {
+            Status::AlreadyExists
         } else {
             let mut dir = Node::new();
             dir.directory = Some(Directory(BTreeMap::new()));
-            self.0.insert(name, dir);
-            0
+            self.0.insert(name.to_string(), dir);
+            Status::Success
         }
     }
 
-    pub fn read_file(&self, name: String) -> (u8, Vec<u8>) {
+    pub fn read_file(&self, name: String) -> (Status, Vec<u8>) {
         if let Some(node) = self.0.get(&name) {
             if let Some(ref f) = node.file {
-                let (_, data) = f.read();
-                (0, data)
+                let fr = f.read();
+                (Status::Success, fr.data)
             } else {
                 // is not a file
-                (2, Vec::new())
+                (Status::WrongType, Vec::new())
             }
         } else {
             // file does not exist
-            (1, Vec::new())
+            (Status::NotFound, Vec::new())
         }
     }
 
@@ -212,23 +237,23 @@ Thank you!
     /// 1: The node requested does not exist
     /// 2: The node is not a directory
     /// 3: The directory is not empty
-    pub fn remove_dir(&mut self, name: String) -> u8 {
+    pub fn remove_dir(&mut self, name: String) -> Status {
         if let Some(node) = self.0.get(&name) {
             if let Some(d) = &node.directory {
                 if d.0.is_empty() {
                     self.0.remove_entry(&name);
                 } else {
                     // Directory not empty
-                    return 3;
+                    return Status::NotEmpty;
                 }
             } else {
                 // Node is not a directory
-                return 2;
+                return Status::WrongType;
             }
         } else {
             // node does not exist
-            return 1;
+            return Status::NotFound;
         }
-        0
+        Status::Success
     }
 }

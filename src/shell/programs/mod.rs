@@ -20,10 +20,21 @@ macro_rules! include_lib {
 
 mod includes {
     pub mod std {
-        pub use crate::shell::{
-            string::{String, ToString},
-            vector::Vec,
-        };
+        pub use crate::shell::programs::includes::stat::{Status, Termination};
+        pub use crate::shell::programs::includes::str::{String, ToString};
+        pub use crate::shell::programs::includes::vec::Vec;
+    }
+
+    pub mod stat {
+        pub use crate::kernel::status::{Status, Termination};
+    }
+
+    pub mod vec {
+        pub use crate::shell::vector::Vec;
+    }
+
+    pub mod str {
+        pub use crate::shell::string::{String, ToString};
     }
 
     pub mod io {

@@ -1,6 +1,6 @@
 crate::include_lib!(std, io);
 
-pub fn main(_: Vec<String>) -> i32 {
+pub fn main(_: Vec<String>) -> Status {
     vga_println!("{}", crate::FLARIO);
-    0
+    Status::Success
 }

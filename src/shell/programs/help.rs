@@ -1,14 +1,13 @@
 crate::include_lib!(std, io);
 
-pub(crate) async fn main(args: Vec<String>) -> i32 {
-    if args.len() > 0 {
+pub(crate) async fn main(args: Vec<String>) -> Status {
+    if !args.is_empty(){
         for arg in args {
             vga_println!("{}", arg);
         }
+        Status::Success
     } else {
         vga_println!("HELP NOT IMPLEMENTED");
-        return 1;
+        Status::NotFound
     }
-
-    0
 }

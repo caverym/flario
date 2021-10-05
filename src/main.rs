@@ -12,12 +12,12 @@ use flario::*;
 // Defines entry point for the bootloader, bootloader defines_start function.
 entry_point!(main);
 
-/// The main entry point of the flario kernel.
+/// The main entry point of the Flario kernel.
 fn main(boot_info: &'static BootInfo) -> ! {
     // Initiate GDT, IDT, & PIC.
     init();
     // Initiate memory
-    let _mem_items = mem_init(&boot_info);
+    let _mem_items = mem_init(boot_info);
 
     // Create executor.
     let mut exe = Executor::new();

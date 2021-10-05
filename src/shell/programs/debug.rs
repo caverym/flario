@@ -20,38 +20,36 @@ impl Display for Item {
 }
 
 impl Item {
-    pub fn from_string(s: &String) -> Result<Self, ()> {
-        return match s.as_str() {
+    pub fn from_string(s: &str) -> Result<Self, ()> {
+        match s {
             "filesystem" => Ok(Self::FileSystem),
             "environment" => Ok(Self::Environment),
             _ => Err(()),
-        };
+        }
     }
 }
 
-pub fn main(args: Vec<String>) -> i32 {
+pub fn main(args: Vec<String>) -> Status {
     for arg in args {
         if let Ok(i) = Item::from_string(&arg) {
-            return match i {
+            match i {
                 Item::FileSystem => debug_fs(),
                 Item::Environment => debug_env(),
             };
         } else {
             vga_println!("{} not an item or not yet implemented", arg);
-            return 1;
+            return Status::NotFound;
         }
     }
-    2
+    Status::Success
 }
 
-fn debug_fs() -> i32 {
+fn debug_fs() {
     crate::include_lib!(fs);
     vga_println!("{:?}", FILESYSTEM.lock());
-    0
 }
 
-fn debug_env() -> i32 {
+fn debug_env() {
     crate::include_lib!(env);
     vga_println!("{:?}", ENVIRON.lock());
-    0
 }
