@@ -1,10 +1,13 @@
-crate::include_lib!(std, io, fs);
+crate::include_lib!(std, io, fs, env);
 
 pub fn main(_: Vec<String>) -> Status {
     let fs = FILESYSTEM.lock();
+    let env = ENVIRON.lock();
+    let cwd = env.value_of("cwd").unwrap_or_else(|| String::from("/"));
     vga_println!(".");
     let level = 1;
-    for (name, node) in fs.list_node() {
+    let dirread = fs.list_node(&cwd);
+    for (name, node) in dirread.nodes {
         tree_func(name, node, level);
     }
     Status::Success

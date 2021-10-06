@@ -4,13 +4,12 @@ use crate::shell::string::ToString;
 use core::fmt::{Display, Formatter};
 use lazy_static::lazy_static;
 use spin::Mutex;
+use crate::kernel::status::Status;
 
 lazy_static! {
     pub static ref ENVIRON: Mutex<Environment> = {
         let mut env = Environment::new();
-        assert_eq!(env.add("cwd", "/")
-            .expect("failed to initialize env"),
-            0);
+        assert_eq!(env.add("cwd", "/").expect("failed to initialize env"), 0);
         Mutex::new(env)
     };
 }
@@ -55,18 +54,46 @@ impl Environment {
         false
     }
 
-    pub fn add(&mut self, name: &str, value: &str) -> Result<usize, u8> {
+    pub fn add(&mut self, name: &str, value: &str) -> Result<usize, Status> {
         let key: Key = Key::new(name.to_string(), value.to_string());
 
         if self.contains_key(&key) || self.contains_entry(&key.name) {
-            return Err(1);
+            return Err(Status::AlreadyExists);
+        } else {
+            let idx = self.0.len();
+
+            self.0.insert(idx, key);
+
+            Ok(idx)
         }
+    }
 
-        let idx = self.0.len();
+    pub fn update(&mut self, name: &str, value: &str) -> Status {
+        let key: Key = Key::new(name.to_string(), value.to_string());
 
-        self.0.insert(idx, key);
+        if self.contains_entry(name) {
+            for (idx, contkey) in self.0.iter().enumerate() {
+                if key.name.clone() == contkey.name {
+                    self.0[idx] = key;
+                    break;
+                }
+            }
+            Status::Success
+        } else {
+            Status::NotFound
+        }
+    }
 
-        Ok(idx)
+    pub fn value_of(&self, name: &str) -> Option<String> {
+        if self.contains_entry(name) {
+            let keys = self.keys();
+            for key in keys {
+                if key.name == name {
+                    return Some(key.value.clone());
+                }
+            }
+        }
+        None
     }
 
     pub fn keys(&self) -> &Vec<Key> {

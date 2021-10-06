@@ -11,6 +11,7 @@ pub mod not_found;
 pub mod read;
 pub mod rmdir;
 pub mod tree;
+pub mod cd;
 
 #[macro_export]
 macro_rules! include_lib {

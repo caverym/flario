@@ -29,6 +29,11 @@ pub struct FileRead {
     pub data: Vec<u8>,
 }
 
+pub struct DirRead<'a> {
+    pub len: usize,
+    pub nodes: Vec<(&'a String, &'a Node)>,
+}
+
 impl File {
     pub const fn new() -> File {
         File {
@@ -193,11 +198,30 @@ Thank you!
         }
     }
 
-    pub fn list_node(&self) -> Vec<(&String, &Node)> {
-        let mut vd: Vec<(&String, &Node)> = Vec::new();
-        for n in &self.0 {
-            vd.insert(vd.len(), n)
+    pub fn list_node(&self, dir: &str) -> DirRead {
+        let mut vd: DirRead = DirRead {
+            len: 0,
+            nodes: Vec::new(),
+        };
+
+        if dir == "/" {
+            for n in &self.0 {
+                vd.nodes.insert(vd.nodes.len(), n);
+            }
+        } else {
+            for (name, node) in &self.0 {
+                if name == dir {
+                    if let Some(dir) = &node.directory {
+                        for n in dir.list_node() {
+                            vd.nodes.insert(vd.nodes.len(), n);
+                        }
+                    }
+                }
+            }
         }
+
+        vd.len = vd.nodes.len();
+
         vd
     }
 
