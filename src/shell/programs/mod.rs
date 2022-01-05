@@ -4,14 +4,13 @@ pub mod debug;
 pub mod env;
 pub mod help;
 pub mod logo;
-pub mod ls;
-pub mod mkdir;
-pub mod mkfile;
+//pub mod ls;
+//pub mod mkdir;
+//pub mod mkfile;
 pub mod not_found;
-pub mod read;
-pub mod rmdir;
-pub mod tree;
-pub mod cd;
+//pub mod read;
+//pub mod rmdir;
+//pub mod tree;
 
 #[macro_export]
 macro_rules! include_lib {
@@ -43,10 +42,6 @@ mod includes {
 
     pub mod io {
         pub use crate::{clear_row, clear_screen, vga_print, vga_println};
-    }
-
-    pub mod fs {
-        pub use crate::kernel::fs::{Node, FILESYSTEM};
     }
 
     pub mod env {

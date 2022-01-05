@@ -2,7 +2,7 @@ use core::fmt::{Display, Formatter};
 crate::include_lib!(std, io);
 
 enum Item {
-    FileSystem,
+    // FileSystem,
     Environment,
 }
 
@@ -12,7 +12,7 @@ impl Display for Item {
             f,
             "{}",
             match self {
-                Item::FileSystem => "filesystem",
+                // Item::FileSystem => "filesystem",
                 Item::Environment => "environment",
             }
         )
@@ -22,7 +22,7 @@ impl Display for Item {
 impl Item {
     pub fn from_string(s: &str) -> Result<Self, ()> {
         match s {
-            "filesystem" => Ok(Self::FileSystem),
+            // "filesystem" => Ok(Self::FileSystem),
             "environment" => Ok(Self::Environment),
             _ => Err(()),
         }
@@ -33,7 +33,7 @@ pub fn main(args: Vec<String>) -> Status {
     for arg in args {
         if let Ok(i) = Item::from_string(&arg) {
             match i {
-                Item::FileSystem => debug_fs(),
+                // Item::FileSystem => debug_fs(),
                 Item::Environment => debug_env(),
             };
         } else {
@@ -44,10 +44,11 @@ pub fn main(args: Vec<String>) -> Status {
     Status::Success
 }
 
+/*
 fn debug_fs() {
     crate::include_lib!(fs);
     vga_println!("{:?}", FILESYSTEM.lock());
-}
+}*/
 
 fn debug_env() {
     crate::include_lib!(env);

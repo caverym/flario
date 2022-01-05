@@ -1,4 +1,4 @@
-use lazy_static::lazy_static;
+use lazy_static::{lazy_static};
 use spin::Mutex;
 use volatile::Volatile;
 use x86_64::instructions::interrupts::without_interrupts;
@@ -103,6 +103,8 @@ pub struct ScreenChar {
     /// color code for the color of this byte
     pub color_code: ColorCode,
 }
+
+
 
 /// BUFFER HEIGHT — The high of the VGA buffer.
 pub const BUFFER_HEIGHT: usize = 25;
