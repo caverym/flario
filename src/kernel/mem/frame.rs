@@ -1,4 +1,4 @@
-use bootloader::bootinfo::{MemoryMap, MemoryRegionType};
+use bootloader::bootinfo::{MemoryMap, MemoryRegion, MemoryRegionType};
 use x86_64::structures::paging::{FrameAllocator, PhysFrame, Size4KiB};
 use x86_64::PhysAddr;
 
@@ -12,21 +12,23 @@ unsafe impl FrameAllocator<Size4KiB> for EmptyFrameAllocator {
 
 #[derive(Debug)]
 pub struct BootInfoFrameAllocator {
-    memory_map: &'static MemoryMap,
+    // memory_map: &'static MemoryMap,
+    memory_reagions: &'static MemoryMap,
     next: usize,
 }
 
 impl BootInfoFrameAllocator {
-    pub unsafe fn init(memory_map: &'static MemoryMap) -> Self {
+    pub unsafe fn init(memory_reagions: &'static MemoryMap) -> Self {
         Self {
-            memory_map,
+            // memory_map,
+            memory_reagions,
             next: 0,
         }
     }
 
     fn usable_frames(&self) -> impl Iterator<Item = PhysFrame> {
-        let regions = self.memory_map.iter();
-        let usable_regions = regions.filter(|r| r.region_type == MemoryRegionType::Usable);
+        let regions = self.memory_reagions;
+        let usable_regions = regions.iter().filter(|r| r.region_type == MemoryRegionType::Usable);
         let addr_ranges = usable_regions.map(|r| r.range.start_addr()..r.range.end_addr());
         let frame_addresses = addr_ranges.flat_map(|r| r.step_by(4096));
         frame_addresses.map(|addr| PhysFrame::containing_address(PhysAddr::new(addr)))

@@ -128,6 +128,9 @@ extern "x86-interrupt" fn double_fault_handler(stack_frame: InterruptStackFrame,
 
 extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: InterruptStackFrame) {
     pic::end_of_interrupt(InterruptIndex::Timer);
+    let mut sc = crate::kernel::sc::SYSTEM_CLOCK.lock();
+    sc.tick();
+    drop(sc);
 }
 
 extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: InterruptStackFrame) {

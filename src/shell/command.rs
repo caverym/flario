@@ -35,6 +35,7 @@ impl From<Vec<String>> for Command {
             ArgZero::Env => super::programs::env::main,
             ArgZero::Logo => super::programs::logo::main,
             ArgZero::NotFound => super::programs::not_found::main,
+            ArgZero::Time => super::programs::time::main,
         }));
 
         Self {
@@ -60,6 +61,7 @@ pub enum ArgZero {
     Env,
     Logo,
     NotFound,
+    Time,
 }
 
 impl core::fmt::Display for ArgZero {
@@ -81,6 +83,7 @@ impl core::fmt::Display for ArgZero {
                 ArgZero::Logo => "logo",
                 ArgZero::Env => "env",
                 ArgZero::NotFound => "not found",
+                ArgZero::Time => "time",
             }
         )
     }
@@ -103,6 +106,7 @@ impl From<String> for ArgZero {
             // "mkfile" => ArgZero::Mkfile,
             "logo" => ArgZero::Logo,
             "env" => ArgZero::Env,
+            "time" => ArgZero::Time,
             _ => ArgZero::NotFound,
         }
     }

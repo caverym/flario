@@ -4,6 +4,7 @@ pub mod debug;
 pub mod env;
 pub mod help;
 pub mod logo;
+pub mod time;
 //pub mod ls;
 //pub mod mkdir;
 //pub mod mkfile;
@@ -42,6 +43,13 @@ mod includes {
 
     pub mod io {
         pub use crate::{clear_row, clear_screen, vga_print, vga_println};
+    }
+
+    pub mod time {
+        pub use crate::kernel::sc::{
+            SYSTEM_CLOCK,
+            Instant,
+        };
     }
 
     pub mod env {
