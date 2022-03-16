@@ -1,11 +1,10 @@
-use core::{sync::atomic::AtomicU16, fmt::Display};
+use core::{fmt::Display, sync::atomic::AtomicU16};
 
 use crate::kernel::{sc::Instant, status::Status};
 
-use alloc::{vec::Vec, string::ToString};
+use alloc::{string::ToString, vec::Vec};
 
 use super::{Filesystem, Inode};
-
 
 #[derive(Debug)]
 pub struct VSFS {
@@ -20,7 +19,7 @@ impl VSFS {
     pub const fn new() -> Self {
         Self {
             imap: Vec::new(),
-            blocks:Vec::new(),
+            blocks: Vec::new(),
         }
     }
 
@@ -41,10 +40,7 @@ impl VSFS {
 
         let len = self.imap.len();
         let node = VFInode::new(Mode(0b00000011_u8), NodeKind::File, self).ok()?;
-        self.imap.insert(
-            len,
-            node,
-        );
+        self.imap.insert(len, node);
 
         Some(&mut self.imap[len])
     }
@@ -69,14 +65,14 @@ pub struct VFInode {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum NodeKind {
     File,
-    Directory
+    Directory,
 }
 
 impl Display for NodeKind {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
-            NodeKind::Directory => write!(f,  "dir"),
-            NodeKind::File => write!(f, "file")
+            NodeKind::Directory => write!(f, "dir"),
+            NodeKind::File => write!(f, "file"),
         }
     }
 }
@@ -89,7 +85,7 @@ impl VFInode {
         if kind == NodeKind::Directory {
             return Self::new_directory(mode, id, fs);
         }
-        
+
         let now = Instant::now();
         let block = match fs.next_free() {
             Some(b) => b,
@@ -115,18 +111,16 @@ impl VFInode {
     fn new_directory(mode: Mode, id: u16, fs: &mut impl Filesystem) -> Result<VFInode, Status> {
         let now = Instant::now();
 
-        Ok(
-            VFInode {
-                mode,
-                ctime: now,
-                mtime: now,
-                dtime: None,
-                id,
-                block: id,
-                size: 0,
-                kind: NodeKind::Directory,
-            }
-        )
+        Ok(VFInode {
+            mode,
+            ctime: now,
+            mtime: now,
+            dtime: None,
+            id,
+            block: id,
+            size: 0,
+            kind: NodeKind::Directory,
+        })
     }
 }
 
@@ -176,16 +170,17 @@ impl Filesystem for VSFS {
         }
 
         let len = self.blocks.len();
-        self.blocks.insert(
-            len,
-            Some(Block([0u8; 4096])),
-        );
+        self.blocks.insert(len, Some(Block([0u8; 4096])));
 
         Some(len as u16)
     }
 
     fn map(&self) -> Self::ImapRef {
-        self.imap.clone().iter().filter_map(|n| if !n.is_deleted() { Some(*n) } else { None }).collect()
+        self.imap
+            .clone()
+            .iter()
+            .filter_map(|n| if !n.is_deleted() { Some(*n) } else { None })
+            .collect()
     }
 
     fn create_file(&mut self) -> Option<&mut Self::File> {

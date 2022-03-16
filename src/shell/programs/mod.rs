@@ -4,11 +4,11 @@ pub mod debug;
 pub mod env;
 pub mod help;
 pub mod logo;
-pub mod time;
 pub mod ls;
 pub mod mkdir;
 pub mod mkfile;
 pub mod not_found;
+pub mod time;
 //pub mod read;
 //pub mod rmdir;
 // pub mod tree;
@@ -34,7 +34,7 @@ mod includes {
     }
 
     pub mod fs {
-        pub use crate::kernel::fs::{Filesystem, FILESYSTEM, Inode};
+        pub use crate::kernel::fs::{Filesystem, Inode, FILESYSTEM};
     }
 
     pub mod vec {

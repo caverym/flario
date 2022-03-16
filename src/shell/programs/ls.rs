@@ -6,7 +6,8 @@ pub fn main(_: Vec<String>) -> Status {
 
     vga_println!("Name\tType\tSize");
     for n in fs.map() {
-        vga_println!("{}\t{}\t{}",
+        vga_println!(
+            "{}\t{}\t{}",
             align("name", n.name()),
             align("type", n.kind()),
             align("size", n.size())
@@ -26,4 +27,3 @@ fn align(row: &str, title: impl Display) -> String {
 
     disp
 }
-
