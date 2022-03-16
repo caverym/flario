@@ -1,4 +1,4 @@
-use core::{ops::Add, fmt::Display};
+use core::{fmt::Display, ops::Add};
 
 use lazy_static::lazy_static;
 use spin::Mutex;
@@ -6,7 +6,6 @@ use spin::Mutex;
 lazy_static! {
     pub static ref SYSTEM_CLOCK: Mutex<SystemClock> = Mutex::new(SystemClock::new(10.0));
 }
-
 
 #[repr(transparent)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -76,7 +75,7 @@ impl SystemClock {
     pub fn tick(&mut self) {
         use core::intrinsics::likely;
         let now = self.tick.checked_add(1);
-        
+
         if likely(now.is_some()) {
             let now = now.unwrap();
             self.tick = now;

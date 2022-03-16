@@ -1,16 +1,27 @@
 mod vsfs;
 
+use alloc::vec::Vec;
+use lazy_static::lazy_static;
+use spin::Mutex;
+
+lazy_static! {
+    pub static ref FILESYSTEM: Mutex<vsfs::VSFS> = Mutex::new(vsfs::VSFS::new());
+}
+
 pub trait Filesystem {
     type File: Inode;
-    type OpenFile;
     type Directory: Inode;
-    type OpenDirectory;
+    type ImapRef;
 
-    fn create_file(&mut self) -> bool;
+    fn next_free(&mut self) -> Option<u16>;
 
-    fn create_dir(&mut self) -> bool;
+    fn map(&self) -> Self::ImapRef;
 
-    fn open_file(&mut self) -> Self::OpenFile;
+    fn create_file(&mut self) -> Option<&mut Self::File>;
+
+    fn create_dir(&mut self) -> Option<&mut Self::Directory>;
+
+    fn open_file(&mut self) -> Self::File;
 
     fn open_dir(&mut self) -> Self::Directory;
 }
@@ -22,11 +33,5 @@ pub trait Inode {
         !self.is_file()
     }
 
-    fn read(&mut self, data: &mut &[u8]) -> usize;
-
-    fn write(&mut self, data: &[u8]) -> usize;
-
-    fn seek(&mut self, pos: usize) -> usize;
-
-    fn position(&self) -> usize;
+    fn is_deleted(&self) -> bool;
 }
