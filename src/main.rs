@@ -5,6 +5,7 @@
 #![reexport_test_harness_main = "test_main"]
 
 extern crate alloc;
+use flario::kernel::mem::MemoryItems;
 use flario::kernel::task::executor::Executor;
 use flario::kernel::task::Task;
 use flario::*;
@@ -14,12 +15,17 @@ entry_point!(main);
 /// The main entry point of the Flario kernel.
 fn main(boot_info: &'static BootInfo) -> ! {
     init();
-    let _mem_items = mem_init(boot_info);
+    let mem_items = mem_init(boot_info);
 
     let mut exe = Executor::new();
     exe.spawn(Task::new(welcome()));
     exe.spawn(Task::new(shell::main::shell()));
+    exe.spawn(Task::new(print_memory(mem_items)));
     exe.run();
+}
+
+async fn print_memory(mem: MemoryItems) {
+    serial_println!("{:#?}", mem);
 }
 
 /// Panic handler. Panics then halts the CPU indefinitely.

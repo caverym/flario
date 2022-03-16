@@ -5,7 +5,7 @@ use x86_64::{
 
 /*
 Creates and initiates memory page table
- */
+*/
 
 /// Function which actively initiates the page table
 pub unsafe fn init(physical_memory_offset: VirtAddr) -> OffsetPageTable<'static> {

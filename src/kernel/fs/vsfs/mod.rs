@@ -1,8 +1,8 @@
-use core::sync::atomic::AtomicU16;
+use core::{sync::atomic::AtomicU16, fmt::Display};
 
 use crate::kernel::{sc::Instant, status::Status};
 
-use alloc::{vec::Vec, boxed::Box};
+use alloc::{vec::Vec, string::ToString};
 
 use super::{Filesystem, Inode};
 
@@ -66,17 +66,31 @@ pub struct VFInode {
 }
 
 #[repr(u8)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum NodeKind {
     File,
     Directory
 }
 
+impl Display for NodeKind {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            NodeKind::Directory => write!(f,  "dir"),
+            NodeKind::File => write!(f, "file")
+        }
+    }
+}
+
 impl VFInode {
     pub fn new(mode: Mode, kind: NodeKind, fs: &mut impl Filesystem) -> Result<VFInode, Status> {
         static IDGEN: AtomicU16 = AtomicU16::new(0);
-        let now = Instant::now();
         let id = IDGEN.fetch_add(1, core::sync::atomic::Ordering::Relaxed);
+
+        if kind == NodeKind::Directory {
+            return Self::new_directory(mode, id, fs);
+        }
+        
+        let now = Instant::now();
         let block = match fs.next_free() {
             Some(b) => b,
             None => return Err(Status::FailedToWrite),
@@ -93,15 +107,48 @@ impl VFInode {
             kind,
         })
     }
+
+    pub fn kind(&self) -> NodeKind {
+        self.kind
+    }
+
+    fn new_directory(mode: Mode, id: u16, fs: &mut impl Filesystem) -> Result<VFInode, Status> {
+        let now = Instant::now();
+
+        Ok(
+            VFInode {
+                mode,
+                ctime: now,
+                mtime: now,
+                dtime: None,
+                id,
+                block: id,
+                size: 0,
+                kind: NodeKind::Directory,
+            }
+        )
+    }
 }
 
 impl super::Inode for VFInode {
     fn is_file(&self) -> bool {
-        true
+        self.kind == NodeKind::File
     }
 
     fn is_deleted(&self) -> bool {
         self.dtime.is_some()
+    }
+
+    fn name(&self) -> alloc::string::String {
+        self.id().to_string()
+    }
+
+    fn id(&self) -> u16 {
+        self.id
+    }
+
+    fn size(&self) -> usize {
+        self.size as usize
     }
 }
 

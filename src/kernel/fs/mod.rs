@@ -1,6 +1,6 @@
 mod vsfs;
 
-use alloc::vec::Vec;
+use alloc::{vec::Vec, string::String};
 use lazy_static::lazy_static;
 use spin::Mutex;
 
@@ -32,6 +32,12 @@ pub trait Inode {
     fn is_dir(&self) -> bool {
         !self.is_file()
     }
+
+    fn name(&self) -> String;
+
+    fn id(&self) -> u16;
+
+    fn size(&self) -> usize;
 
     fn is_deleted(&self) -> bool;
 }
