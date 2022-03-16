@@ -2,7 +2,7 @@
 #![no_main]
 
 use core::panic::PanicInfo;
-use flario::{drivers::qemu, vs_println, Testable};
+use flario::{drivers::qemu, vs_println};
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
@@ -13,7 +13,7 @@ pub extern "C" fn _start() -> ! {
 }
 
 #[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
+fn panic(_info: &PanicInfo) -> ! {
     vs_println!("[OK]");
     qemu::exit_qemu(qemu::QemuExitCode::Success);
     loop {}

@@ -14,7 +14,7 @@ use flario::kernel::mem::globalloc::heap::HEAP_SIZE;
 
 entry_point!(main);
 
-fn main(boot_info: &'static mut BootInfo) -> ! {
+fn main(boot_info: &'static BootInfo) -> ! {
     use flario::*;
     init();
     let mem_items = mem_init(boot_info);

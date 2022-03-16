@@ -108,7 +108,7 @@ impl VFInode {
         self.kind
     }
 
-    fn new_directory(mode: Mode, id: u16, fs: &mut impl Filesystem) -> Result<VFInode, Status> {
+    fn new_directory(mode: Mode, id: u16, _fs: &mut impl Filesystem) -> Result<VFInode, Status> {
         let now = Instant::now();
 
         Ok(VFInode {

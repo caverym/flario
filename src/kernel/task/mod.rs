@@ -3,7 +3,7 @@ use core::future::Future;
 use core::pin::Pin;
 use core::sync::atomic::{AtomicU64, Ordering};
 
-use crate::vga_println;
+
 
 pub mod executor;
 pub mod keyboard;

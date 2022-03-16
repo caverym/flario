@@ -1,6 +1,6 @@
 mod vsfs;
 
-use alloc::{string::String, vec::Vec};
+use alloc::{string::String};
 use lazy_static::lazy_static;
 use spin::Mutex;
 
