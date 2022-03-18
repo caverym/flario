@@ -11,7 +11,8 @@ pub mod not_found;
 pub mod time;
 //pub mod read;
 //pub mod rmdir;
-// pub mod tree;
+pub mod cd;
+pub mod tree;
 
 #[macro_export]
 macro_rules! include_lib {
@@ -54,6 +55,6 @@ mod includes {
     }
 
     pub mod env {
-        pub use crate::shell::environ::{Environment, Key, ENVIRON};
+        pub use crate::kernel::environ::{Environment, Key, ENVIRON};
     }
 }

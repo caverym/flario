@@ -1,7 +1,7 @@
-use super::string::String;
-use super::vector::Vec;
 use crate::kernel::status::Status;
 use crate::shell::string::ToString;
+use alloc::string::String;
+use alloc::vec::Vec;
 use core::fmt::{Display, Formatter};
 use lazy_static::lazy_static;
 use spin::Mutex;
@@ -39,6 +39,17 @@ pub struct Environment(Vec<Key>);
 impl Environment {
     pub fn new() -> Environment {
         Environment(Vec::new())
+    }
+
+    pub fn cwd(&self) -> u16 {
+        if let Some(cwd) = self.get("cwd") {
+            if cwd == "/" {
+                return 0;
+            }
+            cwd.parse::<u16>().unwrap()
+        } else {
+            0
+        }
     }
 
     pub fn contains_key(&self, key: &Key) -> bool {
@@ -84,7 +95,7 @@ impl Environment {
         }
     }
 
-    pub fn value_of(&self, name: &str) -> Option<String> {
+    pub fn get(&self, name: &str) -> Option<String> {
         if self.contains_entry(name) {
             let keys = self.keys();
             for key in keys {

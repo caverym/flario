@@ -1,6 +1,6 @@
 use core::{fmt::Display, sync::atomic::AtomicU16};
 
-use crate::kernel::{sc::Instant, status::Status};
+use crate::kernel::{environ::ENVIRON, sc::Instant, status::Status};
 
 use alloc::{string::ToString, vec::Vec};
 
@@ -13,14 +13,34 @@ pub struct VSFS {
 }
 
 #[derive(Debug)]
-pub struct Imap(pub [Option<VFInode>; 16]);
+pub struct Imap(pub [Option<VFInode>; 8]);
 
 impl VSFS {
-    pub const fn new() -> Self {
-        Self {
+    pub fn new() -> Self {
+        let mut fs = Self {
             imap: Vec::new(),
             blocks: Vec::new(),
+        };
+
+        fs.create_dir();
+
+        fs
+    }
+
+    pub fn node_children(&self, parent: &impl Inode) -> Vec<&VFInode> {
+        let mut children = Vec::new();
+
+        for node in &self.imap {
+            if node.parent == parent.id() {
+                children.push(node);
+            }
         }
+
+        children
+    }
+
+    pub fn get_node(&self, id: u16) -> Option<&VFInode> {
+        self.imap.iter().find(|node| node.id() == id)
     }
 
     fn first_deleted(&self) -> Option<usize> {
@@ -47,18 +67,18 @@ impl VSFS {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct Block([u8; 4096]);
+pub struct Block([u8; 2046]);
 
 #[derive(Debug, Clone, Copy)]
 pub struct VFInode {
     mode: Mode,
-    ctime: Instant,
     mtime: Instant,
     dtime: Option<Instant>,
     id: u16,
     block: u16,
-    size: u16,
+    size: usize,
     kind: NodeKind,
+    parent: u16,
 }
 
 #[repr(u8)]
@@ -92,15 +112,17 @@ impl VFInode {
             None => return Err(Status::FailedToWrite),
         };
 
+        let parent = ENVIRON.lock().cwd();
+
         Ok(VFInode {
             mode,
-            ctime: now,
             mtime: now,
             dtime: None,
             id,
             block,
             size: 0,
             kind,
+            parent,
         })
     }
 
@@ -110,16 +132,17 @@ impl VFInode {
 
     fn new_directory(mode: Mode, id: u16, _fs: &mut impl Filesystem) -> Result<VFInode, Status> {
         let now = Instant::now();
+        let parent = ENVIRON.lock().cwd();
 
         Ok(VFInode {
             mode,
-            ctime: now,
             mtime: now,
             dtime: None,
             id,
             block: id,
             size: 0,
             kind: NodeKind::Directory,
+            parent: parent,
         })
     }
 }
@@ -134,7 +157,11 @@ impl super::Inode for VFInode {
     }
 
     fn name(&self) -> alloc::string::String {
-        self.id().to_string()
+        if self.id() == 0 {
+            return "/".to_string();
+        } else {
+            self.id().to_string()
+        }
     }
 
     fn id(&self) -> u16 {
@@ -170,16 +197,17 @@ impl Filesystem for VSFS {
         }
 
         let len = self.blocks.len();
-        self.blocks.insert(len, Some(Block([0u8; 4096])));
+        self.blocks.insert(len, Some(Block([0u8; 2046])));
 
         Some(len as u16)
     }
 
     fn map(&self) -> Self::ImapRef {
-        self.imap
-            .clone()
+        let cwd = ENVIRON.lock().cwd();
+        let current_node = self.get_node(cwd).unwrap();
+        self.node_children(current_node)
             .iter()
-            .filter_map(|n| if !n.is_deleted() { Some(*n) } else { None })
+            .map(|n| *n.clone())
             .collect()
     }
 

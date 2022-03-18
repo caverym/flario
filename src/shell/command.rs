@@ -25,7 +25,7 @@ impl From<Vec<String>> for Command {
             ArgZero::Help => super::programs::help::main,
             ArgZero::About => super::programs::about::main,
             ArgZero::Ls => super::programs::ls::main,
-            // ArgZero::Tree => super::programs::tree::main,
+            ArgZero::Tree => super::programs::tree::main,
             ArgZero::Mkdir => super::programs::mkdir::main,
             // ArgZero::Rmdir => super::programs::rmdir::main,
             ArgZero::Debug => super::programs::debug::main,
@@ -36,6 +36,7 @@ impl From<Vec<String>> for Command {
             ArgZero::Logo => super::programs::logo::main,
             ArgZero::NotFound => super::programs::not_found::main,
             ArgZero::Time => super::programs::time::main,
+            ArgZero::Cd => super::programs::cd::main,
         }));
 
         Self {
@@ -51,7 +52,7 @@ pub enum ArgZero {
     Help,
     About,
     Ls,
-    // Tree,
+    Tree,
     Mkdir,
     //Rmdir,
     Debug,
@@ -62,6 +63,7 @@ pub enum ArgZero {
     Logo,
     NotFound,
     Time,
+    Cd,
 }
 
 impl core::fmt::Display for ArgZero {
@@ -73,7 +75,7 @@ impl core::fmt::Display for ArgZero {
                 ArgZero::Help => "help",
                 ArgZero::About => "about",
                 ArgZero::Ls => "ls",
-                // ArgZero::Tree => "tree",
+                ArgZero::Tree => "tree",
                 ArgZero::Mkdir => "mkdir",
                 // ArgZero::Rmdir => "rmdir",
                 ArgZero::Debug => "debug",
@@ -84,6 +86,7 @@ impl core::fmt::Display for ArgZero {
                 ArgZero::Env => "env",
                 ArgZero::NotFound => "not found",
                 ArgZero::Time => "time",
+                ArgZero::Cd => "cd",
             }
         )
     }
@@ -97,7 +100,7 @@ impl From<String> for ArgZero {
             "help" => ArgZero::Help,
             "about" => ArgZero::About,
             "ls" => ArgZero::Ls,
-            // "tree" => ArgZero::Tree,
+            "tree" => ArgZero::Tree,
             "mkdir" => ArgZero::Mkdir,
             // "rmdir" => ArgZero::Rmdir,
             "debug" => ArgZero::Debug,
@@ -107,6 +110,7 @@ impl From<String> for ArgZero {
             "logo" => ArgZero::Logo,
             "env" => ArgZero::Env,
             "time" => ArgZero::Time,
+            "cd" => ArgZero::Cd,
             _ => ArgZero::NotFound,
         }
     }

@@ -20,6 +20,7 @@ entry_point!(test_main_entry);
 pub mod drivers;
 pub mod kernel;
 pub mod shell;
+pub mod utils;
 
 /// CPU Halt instruction. Halts CPU execution in an infinite loop.
 pub fn halt() -> ! {

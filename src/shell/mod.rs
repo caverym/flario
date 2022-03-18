@@ -1,5 +1,4 @@
 mod command;
-mod environ;
 pub mod main;
 pub mod program;
 mod programs;

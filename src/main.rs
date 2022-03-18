@@ -20,12 +20,7 @@ fn main(boot_info: &'static BootInfo) -> ! {
     let mut exe = Executor::new();
     exe.spawn(Task::new(welcome()));
     exe.spawn(Task::new(shell::main::shell()));
-    exe.spawn(Task::new(print_memory(mem_items)));
     exe.run();
-}
-
-async fn print_memory(mem: MemoryItems) {
-    serial_println!("{:#?}", mem);
 }
 
 /// Panic handler. Panics then halts the CPU indefinitely.
