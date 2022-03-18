@@ -1,18 +1,13 @@
 crate::include_lib!(std, io, fs);
 
-pub fn main(args: Vec<String>) -> Status {
+pub fn main(_args: Vec<String>) -> Status {
     let mut fs = FILESYSTEM.lock();
-    let mut code = Status::Success;
-    for arg in args {
-        code = fs.create_file(arg.clone());
-        match code {
-            Status::AlreadyExists => {
-                vga_println!("Error: file {} already exists", arg);
-            }
-            _ => {
-                vga_println!("Error: unknown error: {}", code);
-            }
-        }
+
+    if let Some(file) = fs.create_file() {
+        vga_println!("{:?}", file);
+    } else {
+        vga_println!("failed to create file");
     }
-    code
+
+    Status::Success
 }

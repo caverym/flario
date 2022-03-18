@@ -17,7 +17,7 @@ entry_point!(main);
 fn main(boot_info: &'static BootInfo) -> ! {
     use flario::*;
     init();
-    let mut mem_items = mem_init(boot_info);
+    let _mem_items = mem_init(boot_info);
 
     test_main();
     halt();

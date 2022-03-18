@@ -1,10 +1,10 @@
 use super::string::String;
 use super::vector::Vec;
+use crate::kernel::status::Status;
 use crate::shell::string::ToString;
 use core::fmt::{Display, Formatter};
 use lazy_static::lazy_static;
 use spin::Mutex;
-use crate::kernel::status::Status;
 
 lazy_static! {
     pub static ref ENVIRON: Mutex<Environment> = {

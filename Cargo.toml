@@ -17,7 +17,7 @@ pc-keyboard = "0.5"
 linked_list_allocator = "0.9"
 
 [dependencies.bootloader]
-version = "0.9.20"
+version = "0.9"
 features = ["map_physical_memory"]
 
 [dependencies.lazy_static]

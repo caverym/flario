@@ -32,6 +32,10 @@ impl Shell {
                 continue;
             }
 
+            if args[0] == "exit" {
+                break;
+            }
+
             let cmd: Command = args.into();
 
             self.exe(cmd).await;

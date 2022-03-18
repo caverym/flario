@@ -1,4 +1,6 @@
-use lazy_static::{lazy_static};
+use core::fmt::Write;
+
+use lazy_static::lazy_static;
 use spin::Mutex;
 use volatile::Volatile;
 use x86_64::instructions::interrupts::without_interrupts;
@@ -104,8 +106,6 @@ pub struct ScreenChar {
     pub color_code: ColorCode,
 }
 
-
-
 /// BUFFER HEIGHT — The high of the VGA buffer.
 pub const BUFFER_HEIGHT: usize = 25;
 /// BUFFER_WIDTH — The width of the VGA buffer.
@@ -159,8 +159,16 @@ impl Writer {
         for byte in s.bytes() {
             match byte {
                 0x20..=0x7e | b'\n' => self.write_byte(byte),
+                b'\t' => self.write_tab(),
                 _ => self.write_byte(0xfe),
             }
+        }
+    }
+
+    pub fn write_tab(&mut self) {
+        self.write_byte(b' ');
+        while !self.column_position % 4 == 0 {
+            self.write_byte(b' ');
         }
     }
 

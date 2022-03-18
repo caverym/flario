@@ -4,13 +4,14 @@ pub mod debug;
 pub mod env;
 pub mod help;
 pub mod logo;
-//pub mod ls;
-//pub mod mkdir;
-//pub mod mkfile;
+pub mod ls;
+pub mod mkdir;
+pub mod mkfile;
 pub mod not_found;
+pub mod time;
 //pub mod read;
 //pub mod rmdir;
-//pub mod tree;
+// pub mod tree;
 
 #[macro_export]
 macro_rules! include_lib {
@@ -32,6 +33,10 @@ mod includes {
         pub use crate::kernel::status::{Status, Termination};
     }
 
+    pub mod fs {
+        pub use crate::kernel::fs::{Filesystem, Inode, FILESYSTEM};
+    }
+
     pub mod vec {
         pub use crate::shell::vector::Vec;
     }
@@ -42,6 +47,10 @@ mod includes {
 
     pub mod io {
         pub use crate::{clear_row, clear_screen, vga_print, vga_println};
+    }
+
+    pub mod time {
+        pub use crate::kernel::sc::{Instant, SYSTEM_CLOCK};
     }
 
     pub mod env {
