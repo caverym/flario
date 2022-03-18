@@ -16,7 +16,7 @@ pub enum Status {
 }
 
 impl FromResidual for Status {
-    fn from_residual(residual: <Self as Try>::Residual) -> Self {
+    fn from_residual(_residual: <Self as Try>::Residual) -> Self {
         todo!()
     }
 }

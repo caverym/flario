@@ -5,7 +5,7 @@
 #![reexport_test_harness_main = "test_main"]
 
 extern crate alloc;
-use flario::kernel::mem::MemoryItems;
+
 use flario::kernel::task::executor::Executor;
 use flario::kernel::task::Task;
 use flario::*;
@@ -15,7 +15,7 @@ entry_point!(main);
 /// The main entry point of the Flario kernel.
 fn main(boot_info: &'static BootInfo) -> ! {
     init();
-    let mem_items = mem_init(boot_info);
+    let _mem_items = mem_init(boot_info);
 
     let mut exe = Executor::new();
     exe.spawn(Task::new(welcome()));

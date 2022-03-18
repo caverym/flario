@@ -7,7 +7,7 @@ crate::include_lib!(std, io, fs, env);
 pub fn main(_: Vec<String>) -> Status {
     let fs = FILESYSTEM.lock();
     let env = ENVIRON.lock();
-    let cwd = env.cwd();
+    let _cwd = env.cwd();
     drop(env);
     vga_println!(".");
     let level = 1;
