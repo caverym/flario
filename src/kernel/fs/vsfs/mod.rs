@@ -36,7 +36,16 @@ impl VSFS {
             }
         }
 
-        children.iter().filter_map(|n| if n.id() != parent.id() { Some(*n) } else { None }).collect()
+        children
+            .iter()
+            .filter_map(|n| {
+                if n.id() != parent.id() {
+                    Some(*n)
+                } else {
+                    None
+                }
+            })
+            .collect()
     }
 
     pub fn get_node(&self, id: u16) -> Option<&VFInode> {

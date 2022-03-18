@@ -1,4 +1,7 @@
-use core::{fmt::{Display, Formatter}, ops::{Try, FromResidual, ControlFlow}};
+use core::{
+    fmt::{Display, Formatter},
+    ops::{ControlFlow, FromResidual, Try},
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
