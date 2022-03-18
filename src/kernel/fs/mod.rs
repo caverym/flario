@@ -1,4 +1,4 @@
-mod vsfs;
+pub mod vsfs;
 
 use alloc::string::String;
 use lazy_static::lazy_static;

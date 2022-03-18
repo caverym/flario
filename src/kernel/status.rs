@@ -1,4 +1,4 @@
-use core::fmt::{Display, Formatter};
+use core::{fmt::{Display, Formatter}, ops::{Try, FromResidual, ControlFlow}};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
@@ -10,6 +10,34 @@ pub enum Status {
     FailedToRead = 4,
     AlreadyExists = 5,
     NotEmpty = 6,
+}
+
+impl FromResidual for Status {
+    fn from_residual(residual: <Self as Try>::Residual) -> Self {
+        todo!()
+    }
+}
+
+impl Try for Status {
+    type Output = Status;
+
+    type Residual = Status;
+
+    fn from_output(output: Self::Output) -> Self {
+        output
+    }
+
+    fn branch(self) -> core::ops::ControlFlow<Self::Residual, Self::Output> {
+        match self {
+            Status::Success => ControlFlow::Continue(self),
+            Status::NotFound => ControlFlow::Break(self),
+            Status::WrongType => ControlFlow::Break(self),
+            Status::FailedToWrite => ControlFlow::Break(self),
+            Status::FailedToRead => ControlFlow::Break(self),
+            Status::AlreadyExists => ControlFlow::Break(self),
+            Status::NotEmpty => ControlFlow::Break(self),
+        }
+    }
 }
 
 impl Display for Status {
