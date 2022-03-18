@@ -37,23 +37,21 @@ pub fn main(args: Vec<String>) -> Status {
     Status::Success
 }
 
-fn find_in_node(fs: &MutexGuard<VSFS>, _node: &impl Inode, path: &str) -> Status {
-    if let Some(root) = fs.get_node(0) {
-        let children = fs.node_children(root);
+fn find_in_node(fs: &MutexGuard<VSFS>, node: &impl Inode, path: &str) -> Status {
+    let children = fs.node_children(node);
 
-        for child in children {
-            if child.is_file() {
-                continue;
-            };
+    for child in children {
+        if child.is_file() {
+            continue;
+        };
 
-            if child.name() == path {
-                let mut env = ENVIRON.lock();
-                env.update("cwd", &path);
-                return Status::Success;
-            }
-
-            find_in_node(fs, child, path)?;
+        if child.name() == path {
+            let mut env = ENVIRON.lock();
+            env.update("cwd", &path);
+            return Status::Success;
         }
+
+        find_in_node(fs, child, path)?;
     }
 
     Status::NotFound
