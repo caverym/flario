@@ -1,16 +1,22 @@
 // pub mod vsfs; I don't feel like updating the API on a FS that crashes constantly
-pub mod btfs;
+mod btfs;
+pub mod public;
+pub use public::*;
 
-use alloc::string::String;
+use alloc::{string::String, collections::BTreeMap};
 use lazy_static::lazy_static;
 use spin::Mutex;
 
 use self::btfs::fs::NodeIdent;
 
-type CurrentFileSystem = btfs::fs::BTFS;
+pub type CurrentFileSystem = btfs::fs::BTFS;
+pub type Identifier = NodeIdent;
+pub type File = btfs::node::Node;
+pub type Directory = btfs::node::Node;
+pub type ImapRef = BTreeMap<u16, FileDescriptor<Identifier>>;
 
 lazy_static! {
-    pub static ref FILESYSTEM: Mutex<CurrentFileSystem> = Mutex::new(CurrentFileSystem::new());
+    static ref FILESYSTEM: Mutex<CurrentFileSystem> = Mutex::new(CurrentFileSystem::new());
 }
 
 #[derive(Debug)]
@@ -21,43 +27,42 @@ impl FileDescriptor<NodeIdent> {
         FileDescriptor(id, kind)
     }
 
-    pub fn id(&self, fs: &mut CurrentFileSystem) -> Option<u16> {
+    pub fn id(&self) -> Option<u16> {
+        let mut fs = FILESYSTEM.lock();
         fs.flatten_ident(&self.0)
     }
 
-    pub fn name(&self, fs: &mut CurrentFileSystem) -> Option<String> {
+    pub fn name(&self) -> Option<String> {
+        let mut fs = FILESYSTEM.lock();
         let id = fs.flatten_ident(&self.0)?;
         let node = fs.imap.get(&id)?;
         Some(node.name())
     }
 
-    pub fn kind(&self, fs: &mut CurrentFileSystem) -> Option<bool> {
+    pub fn kind(&self) -> Option<bool> {
+        let mut fs = FILESYSTEM.lock();
         let id = fs.flatten_ident(&self.0)?;
         let node = fs.imap.get(&id)?;
         Some(node.is_dir())
     }
 
-    pub fn size(&self, fs: &mut CurrentFileSystem) -> Option<usize> {
+    pub fn size(&self) -> Option<usize> {
+        let mut fs = FILESYSTEM.lock();
         let id = fs.flatten_ident(&self.0)?;
         fs.size(id)
     }
 }
 
 pub trait FileSystem {
-    type Identifier: Clone + Ord + PartialOrd + Eq + PartialEq;
-    type File: Inode;
-    type Directory: Inode;
-    type ImapRef;
-
     fn next_free(&mut self) -> Option<u16>;
 
-    fn map(&self) -> Option<Self::ImapRef>;
+    fn map(&self) -> Option<ImapRef>;
 
-    fn create_file(&mut self, name: &str) -> Option<FileDescriptor<Self::Identifier>>;
+    fn create_file(&mut self, name: &str) -> Option<FileDescriptor<Identifier>>;
 
-    fn create_dir(&mut self, name: &str) -> Option<FileDescriptor<Self::Identifier>>;
+    fn create_dir(&mut self, name: &str) -> Option<FileDescriptor<Identifier>>;
 
-    fn open(&mut self, ident: Self::Identifier) -> Option<FileDescriptor<Self::Identifier>>;
+    fn open(&mut self, ident: Identifier) -> Option<FileDescriptor<Identifier>>;
 
     fn size(&self, ident: u16) -> Option<usize>;
 }

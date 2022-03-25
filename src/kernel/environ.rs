@@ -6,8 +6,57 @@ use core::fmt::{Display, Formatter};
 use lazy_static::lazy_static;
 use spin::Mutex;
 
+mod public {
+    use alloc::{string::String, vec::Vec};
+
+    use crate::kernel::status::Status;
+
+    use super::{ENVIRON, Key};
+
+    pub struct EnvironmentRef;
+
+    impl EnvironmentRef {
+        pub fn new() -> Self {
+            EnvironmentRef
+        }
+
+        pub fn cwd(&self) -> String {
+            ENVIRON.lock().cwd()
+        }
+
+        pub fn contains_key(&self, key: &Key) -> bool {
+            ENVIRON.lock().contains_key(key)
+        }
+
+        pub fn contains_entry(&self, key: &str) -> bool {
+            ENVIRON.lock().contains_entry(key)
+        }
+
+        pub fn add(&self, key: &str, value: &str) -> Result<usize, Status> {
+            ENVIRON.lock().add(key, value)
+        }
+
+        pub fn update(&self, name: &str, value: &str) -> Status {
+            ENVIRON.lock().update(name, value)
+        }
+
+        pub fn get(&self, name: &str) -> Option<String> {
+            ENVIRON.lock().get(name)
+        }
+
+        pub fn keys(&self) -> Vec<Key> {
+            ENVIRON.lock().keys().clone()
+        }
+    }
+
+    pub fn environmentref() -> EnvironmentRef {
+        EnvironmentRef::new()
+    }
+}
+pub use public::*;
+
 lazy_static! {
-    pub static ref ENVIRON: Mutex<Environment> = {
+    static ref ENVIRON: Mutex<Environment> = {
         let mut env = Environment::new();
         assert_eq!(env.add("cwd", "/").expect("failed to initialize env"), 0);
         Mutex::new(env)
@@ -34,7 +83,7 @@ impl Display for Key {
 
 #[repr(transparent)]
 #[derive(Debug, Clone)]
-pub struct Environment(Vec<Key>);
+struct Environment(Vec<Key>);
 
 impl Environment {
     pub fn new() -> Environment {

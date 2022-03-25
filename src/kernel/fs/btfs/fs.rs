@@ -1,7 +1,6 @@
 use super::node::{Node, NodeContent};
 use crate::{kernel::{
-    environ::ENVIRON,
-    fs::{FileDescriptor, FileSystem, Inode},
+    fs::{FileDescriptor, FileSystem, Inode, Identifier, ImapRef}, environ::EnvironmentRef,
 }, vga_println};
 use alloc::{
     collections::BTreeMap,
@@ -48,18 +47,13 @@ pub enum NodeIdent {
 }
 
 impl FileSystem for BTFS {
-    type Identifier = NodeIdent;
-    type File = Node;
-    type Directory = Node;
-    type ImapRef = BTreeMap<u16, FileDescriptor<Self::Identifier>>;
-
     fn next_free(&mut self) -> Option<u16> {
         static NEXT_ID: AtomicU16 = AtomicU16::new(1);
         Some(NEXT_ID.fetch_add(1, core::sync::atomic::Ordering::Relaxed))
     }
 
-    fn map(&self) -> Option<Self::ImapRef> {
-        let cwd = ENVIRON.lock().cwd();
+    fn map(&self) -> Option<ImapRef> {
+        let cwd = EnvironmentRef::new().cwd();
         let mut map: BTreeMap<u16, FileDescriptor<NodeIdent>> = BTreeMap::new();
 
         if cwd == "/" {
@@ -87,7 +81,7 @@ impl FileSystem for BTFS {
         Some(map)
     }
 
-    fn create_file(&mut self, name: &str) -> Option<FileDescriptor<Self::Identifier>> {
+    fn create_file(&mut self, name: &str) -> Option<FileDescriptor<Identifier>> {
         let id = self.next_free()?;
         vga_println!("ID generated");
         let mut full = name.to_string();
@@ -109,7 +103,7 @@ impl FileSystem for BTFS {
         Some(FileDescriptor(NodeIdent::Id(id), false))
     }
 
-    fn create_dir(&mut self, name: &str) -> Option<FileDescriptor<Self::Identifier>> {
+    fn create_dir(&mut self, name: &str) -> Option<FileDescriptor<Identifier>> {
         let id = self.next_free()?;
         vga_println!("ID generated");
         let mut full = name.to_string();
@@ -131,7 +125,7 @@ impl FileSystem for BTFS {
         Some(FileDescriptor(NodeIdent::Id(id), false))
     }
 
-    fn open(&mut self, id: Self::Identifier) -> Option<FileDescriptor<Self::Identifier>> {
+    fn open(&mut self, id: Identifier) -> Option<FileDescriptor<Identifier>> {
         match id {
             NodeIdent::Root => Some(FileDescriptor(NodeIdent::Root, true)),
             NodeIdent::Id(id) => Some(FileDescriptor(NodeIdent::Id(id), self.imap.get(&id)?.is_dir())),

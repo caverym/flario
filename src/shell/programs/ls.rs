@@ -9,11 +9,11 @@ pub fn main(_: Vec<String>) -> Status {
 }
 
 pub fn rname() -> Option<()> {
-    let mut fs = FILESYSTEM.lock();
+    let mut fs = FileSyetemRef::new();
 
     let map = fs.map()?;
     for (_, fd) in map {
-        vga_println!("{}:{}", fd.name(&mut fs)?, fd.size(&mut fs)?);
+        vga_println!("{}:{}", fd.name()?, fd.size()?);
     }
 
     Some(())

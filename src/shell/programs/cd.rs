@@ -1,6 +1,3 @@
-use crate::kernel::fs::btfs::fs::NodeIdent;
-
-
 crate::include_lib!(std, io, fs, env);
 
 pub fn main(args: Vec<String>) -> Status {
@@ -19,24 +16,21 @@ pub fn main(args: Vec<String>) -> Status {
 }
 
 fn act_cd(path: &str) -> Option<()> {
-    let mut fs = FILESYSTEM.lock();
+    let mut fs = FileSyetemRef::new();
+    let mut env = EnvironmentRef::new();
 
     vga_println!("{}", path);
 
     if path == "/" {
-        let mut env = ENVIRON.lock();
         env.update("cwd", path);
         return Some(());
     }
 
-    let id = fs.flatten_ident(&NodeIdent::Name(path.to_string()))?;
-    let fd = fs.open(NodeIdent::Id(id))?;
+    let fd = fs.open(Identifier::Name(path.to_string()))?;
 
-    if !fd.kind(&mut fs)? {
+    if !fd.kind()? {
         return None;
     }
-
-    let mut env = ENVIRON.lock();
 
     env.update("cwd", path);
 

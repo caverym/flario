@@ -1,6 +1,5 @@
 pub mod about;
 pub mod clear;
-pub mod debug;
 pub mod env;
 pub mod help;
 pub mod logo;
@@ -36,7 +35,7 @@ mod includes {
     }
 
     pub mod fs {
-        pub use crate::kernel::fs::{FileSystem, Inode, FILESYSTEM};
+        pub use crate::kernel::fs::{FileSystem, Inode, FileSyetemRef, filesystemref, Identifier};
     }
 
     pub mod vec {
@@ -56,6 +55,6 @@ mod includes {
     }
 
     pub mod env {
-        pub use crate::kernel::environ::{Environment, Key, ENVIRON};
+        pub use crate::kernel::environ::{Key, EnvironmentRef, environmentref};
     }
 }
