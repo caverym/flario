@@ -1,4 +1,4 @@
-use super::{CurrentFileSystem, FileSystem, Identifier, ImapRef, FILESYSTEM, FileDescriptor};
+use super::{FileSystem, Identifier, ImapRef, FILESYSTEM, FileDescriptor};
 
 pub struct FileSyetemRef;
 

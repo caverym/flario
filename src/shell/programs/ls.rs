@@ -9,7 +9,7 @@ pub fn main(_: Vec<String>) -> Status {
 }
 
 pub fn rname() -> Option<()> {
-    let mut fs = FileSyetemRef::new();
+    let fs = FileSyetemRef::new();
 
     let map = fs.map()?;
     for (_, fd) in map {

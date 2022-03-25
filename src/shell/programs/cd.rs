@@ -16,8 +16,8 @@ pub fn main(args: Vec<String>) -> Status {
 }
 
 fn act_cd(path: &str) -> Option<()> {
-    let mut fs = FileSyetemRef::new();
-    let mut env = EnvironmentRef::new();
+    let fs = FileSyetemRef::new();
+    let env = EnvironmentRef::new();
 
     vga_println!("{}", path);
 

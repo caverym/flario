@@ -28,26 +28,26 @@ impl FileDescriptor<NodeIdent> {
     }
 
     pub fn id(&self) -> Option<u16> {
-        let mut fs = FILESYSTEM.lock();
+        let fs = FILESYSTEM.lock();
         fs.flatten_ident(&self.0)
     }
 
     pub fn name(&self) -> Option<String> {
-        let mut fs = FILESYSTEM.lock();
+        let fs = FILESYSTEM.lock();
         let id = fs.flatten_ident(&self.0)?;
         let node = fs.imap.get(&id)?;
         Some(node.name())
     }
 
     pub fn kind(&self) -> Option<bool> {
-        let mut fs = FILESYSTEM.lock();
+        let fs = FILESYSTEM.lock();
         let id = fs.flatten_ident(&self.0)?;
         let node = fs.imap.get(&id)?;
         Some(node.is_dir())
     }
 
     pub fn size(&self) -> Option<usize> {
-        let mut fs = FILESYSTEM.lock();
+        let fs = FILESYSTEM.lock();
         let id = fs.flatten_ident(&self.0)?;
         fs.size(id)
     }
