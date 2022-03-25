@@ -12,12 +12,13 @@ pub mod time;
 //pub mod read;
 //pub mod rmdir;
 pub mod cd;
-pub mod tree;
+// pub mod tree;
 
 #[macro_export]
 macro_rules! include_lib {
     ($($lib:ident),*) => {
         $(
+            #[allow(unused_imports)]
             use $crate::shell::programs::includes::$lib::*;
         )*
     };
@@ -35,7 +36,7 @@ mod includes {
     }
 
     pub mod fs {
-        pub use crate::kernel::fs::{Filesystem, Inode, FILESYSTEM};
+        pub use crate::kernel::fs::{FileSystem, Inode, FILESYSTEM};
     }
 
     pub mod vec {

@@ -1,12 +1,12 @@
 crate::include_lib!(std, io, fs);
 
-pub fn main(_args: Vec<String>) -> Status {
+pub fn main(args: Vec<String>) -> Status {
     let mut fs = FILESYSTEM.lock();
 
-    if let Some(file) = fs.create_file() {
-        vga_println!("{:?}", file);
-    } else {
-        vga_println!("failed to create file");
+    for name in args {
+        if fs.create_file(&name).is_none() {
+            return Status::FailedToWrite;
+        }
     }
 
     Status::Success

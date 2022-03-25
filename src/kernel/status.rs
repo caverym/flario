@@ -13,6 +13,7 @@ pub enum Status {
     FailedToRead = 4,
     AlreadyExists = 5,
     NotEmpty = 6,
+    PermissionDenied,
 }
 
 impl FromResidual for Status {
@@ -39,6 +40,7 @@ impl Try for Status {
             Status::FailedToRead => ControlFlow::Break(self),
             Status::AlreadyExists => ControlFlow::Break(self),
             Status::NotEmpty => ControlFlow::Break(self),
+            Status::PermissionDenied => ControlFlow::Break(self),
         }
     }
 }

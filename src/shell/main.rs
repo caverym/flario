@@ -11,6 +11,7 @@ struct Shell {
     keyboard: Keyboard<Us104Key, ScancodeSet1>,
     scancodes: ScancodeStream,
     code: Status,
+    last: Option<Command>,
     prompt: char,
 }
 
@@ -20,6 +21,7 @@ impl Shell {
             keyboard,
             scancodes,
             code: Status::Success,
+            last: None,
             prompt: '>',
         }
     }
@@ -37,6 +39,7 @@ impl Shell {
             }
 
             let cmd: Command = args.into();
+            self.last = Some(cmd.clone());
 
             self.exe(cmd).await;
         }

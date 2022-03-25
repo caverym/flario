@@ -1,58 +1,54 @@
 use super::string::String;
 use super::vector::Vec;
 use crate::kernel::status::Status;
-use crate::shell::program::Program;
-use alloc::boxed::Box;
 use core::fmt::Formatter;
-use core::pin::Pin;
 
+#[derive(Debug, Clone)]
 pub struct Command {
     pub arg_zero: ArgZero,
     pub args: Vec<String>,
-    func: Pin<Box<dyn Program>>,
 }
 
 impl Command {
     pub fn execute(self) -> Status {
-        self.func.run(self.args)
+        self.run()
+    }
+
+    pub fn run(self) -> Status {
+        match self.arg_zero {
+            ArgZero::Help => super::programs::help::main(self.args),
+            ArgZero::About => super::programs::about::main(self.args),
+            ArgZero::Ls => super::programs::ls::main(self.args),
+            // ArgZero::Tree => super::programs::tree::main(self.args),
+            ArgZero::Mkdir => super::programs::mkdir::main(self.args),
+            // ArgZero::Rmdir => super::programs::rmdir::main(self.args),
+            ArgZero::Debug => super::programs::debug::main(self.args),
+            // ArgZero::Read => super::programs::read::main(self.args),
+            ArgZero::Clear => super::programs::clear::main(self.args),
+            ArgZero::Mkfile => super::programs::mkfile::main(self.args),
+            ArgZero::Env => super::programs::env::main(self.args),
+            ArgZero::Logo => super::programs::logo::main(self.args),
+            ArgZero::NotFound => super::programs::not_found::main(self.args),
+            ArgZero::Time => super::programs::time::main(self.args),
+            ArgZero::Cd => super::programs::cd::main(self.args),
+        }
     }
 }
 
 impl From<Vec<String>> for Command {
     fn from(mut args: Vec<String>) -> Self {
         let arg_zero: ArgZero = args.remove(0).into();
-        let func = Pin::new(Box::new(match arg_zero {
-            ArgZero::Help => super::programs::help::main,
-            ArgZero::About => super::programs::about::main,
-            ArgZero::Ls => super::programs::ls::main,
-            ArgZero::Tree => super::programs::tree::main,
-            ArgZero::Mkdir => super::programs::mkdir::main,
-            // ArgZero::Rmdir => super::programs::rmdir::main,
-            ArgZero::Debug => super::programs::debug::main,
-            // ArgZero::Read => super::programs::read::main,
-            ArgZero::Clear => super::programs::clear::main,
-            ArgZero::Mkfile => super::programs::mkfile::main,
-            ArgZero::Env => super::programs::env::main,
-            ArgZero::Logo => super::programs::logo::main,
-            ArgZero::NotFound => super::programs::not_found::main,
-            ArgZero::Time => super::programs::time::main,
-            ArgZero::Cd => super::programs::cd::main,
-        }));
 
-        Self {
-            arg_zero,
-            args,
-            func,
-        }
+        Self { arg_zero, args }
     }
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub enum ArgZero {
     Help,
     About,
     Ls,
-    Tree,
+    // Tree,
     Mkdir,
     //Rmdir,
     Debug,
@@ -75,7 +71,7 @@ impl core::fmt::Display for ArgZero {
                 ArgZero::Help => "help",
                 ArgZero::About => "about",
                 ArgZero::Ls => "ls",
-                ArgZero::Tree => "tree",
+                // ArgZero::Tree => "tree",
                 ArgZero::Mkdir => "mkdir",
                 // ArgZero::Rmdir => "rmdir",
                 ArgZero::Debug => "debug",
@@ -100,7 +96,7 @@ impl From<String> for ArgZero {
             "help" => ArgZero::Help,
             "about" => ArgZero::About,
             "ls" => ArgZero::Ls,
-            "tree" => ArgZero::Tree,
+            // "tree" => ArgZero::Tree,
             "mkdir" => ArgZero::Mkdir,
             // "rmdir" => ArgZero::Rmdir,
             "debug" => ArgZero::Debug,

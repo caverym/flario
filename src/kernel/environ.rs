@@ -41,15 +41,8 @@ impl Environment {
         Environment(Vec::new())
     }
 
-    pub fn cwd(&self) -> u16 {
-        if let Some(cwd) = self.get("cwd") {
-            if cwd == "/" {
-                return 0;
-            }
-            cwd.parse::<u16>().unwrap()
-        } else {
-            0
-        }
+    pub fn cwd(&self) -> String {
+        self.get("cwd").expect("environment does not contain cwd")
     }
 
     pub fn contains_key(&self, key: &Key) -> bool {

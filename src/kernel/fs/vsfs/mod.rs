@@ -121,6 +121,7 @@ impl VFInode {
             None => return Err(Status::FailedToWrite),
         };
 
+        core::hint::spin_loop();
         let parent = ENVIRON.lock().cwd();
 
         Ok(VFInode {
@@ -141,6 +142,7 @@ impl VFInode {
 
     fn new_directory(mode: Mode, id: u16, _fs: &mut impl Filesystem) -> Result<VFInode, Status> {
         let now = Instant::now();
+        core::hint::spin_loop();
         let parent = ENVIRON.lock().cwd();
 
         Ok(VFInode {
@@ -194,6 +196,7 @@ pub enum ModeTypes {
 pub struct Mode(u8);
 
 impl Filesystem for VSFS {
+    type Identifier = u16;
     type File = VFInode;
     type Directory = VFInode;
     type ImapRef = Vec<VFInode>;
@@ -212,6 +215,7 @@ impl Filesystem for VSFS {
     }
 
     fn map(&self) -> Self::ImapRef {
+        core::hint::spin_loop();
         let cwd = ENVIRON.lock().cwd();
         let current_node = self.get_node(cwd).unwrap();
         self.node_children(current_node)
@@ -246,11 +250,11 @@ impl Filesystem for VSFS {
         }
     }
 
-    fn open_file(&mut self) -> Self::File {
+    fn open_file(&mut self, id: Self::Identifier) -> Self::File {
         todo!()
     }
 
-    fn open_dir(&mut self) -> Self::Directory {
+    fn open_dir(&mut self, id: Self::Identifier) -> Self::Directory {
         todo!()
     }
 }

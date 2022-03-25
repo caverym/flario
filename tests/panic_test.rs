@@ -9,14 +9,12 @@ pub extern "C" fn _start() -> ! {
     should_panic();
     vs_println!("[FAILED]");
     qemu::exit_qemu(qemu::QemuExitCode::Failed);
-    loop {}
 }
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
     vs_println!("[OK]");
     qemu::exit_qemu(qemu::QemuExitCode::Success);
-    loop {}
 }
 
 fn should_panic() {

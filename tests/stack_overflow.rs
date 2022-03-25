@@ -49,5 +49,4 @@ extern "x86-interrupt" fn test_double_fault_handler(
 ) -> ! {
     vs_println!("[OK]");
     qemu::exit_qemu(qemu::QemuExitCode::Success);
-    loop {}
 }

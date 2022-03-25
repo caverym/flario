@@ -1,66 +1,44 @@
-use spin::MutexGuard;
+use crate::kernel::fs::btfs::fs::NodeIdent;
 
-use crate::kernel::fs::vsfs::VSFS;
 
 crate::include_lib!(std, io, fs, env);
 
 pub fn main(args: Vec<String>) -> Status {
-    let fs = FILESYSTEM.lock();
     if args.len() == 0 {
         vga_println!("Usage: cd <path>");
-        return Status::Success;
+        return Status::FailedToRead;
     }
 
-    let path = args[0].clone();
+    let path = args[0].to_string();
 
-    if path == "0" || path == "/" {
+    if act_cd(&path).is_none() {
+        Status::NotFound
+    } else {
+        Status::Success
+    }
+}
+
+fn act_cd(path: &str) -> Option<()> {
+    let mut fs = FILESYSTEM.lock();
+
+    vga_println!("{}", path);
+
+    if path == "/" {
         let mut env = ENVIRON.lock();
-        env.update("cwd", "/");
-        return Status::Success;
+        env.update("cwd", path);
+        return Some(());
     }
 
-    for node in fs.map() {
-        if node.name() == path {
-            if node.is_file() {
-                vga_println!("{} is not a directory", path);
-                return Status::NotFound;
-            }
+    let id = fs.flatten_ident(&NodeIdent::Name(path.to_string()))?;
+    let fd = fs.open(NodeIdent::Id(id))?;
 
-            let mut env = ENVIRON.lock();
-            env.update("cwd", &path);
-            return Status::Success;
-        }
+    if !fd.kind(&mut fs)? {
+        return None;
     }
 
-    find_from_root(&fs, &path)?;
+    let mut env = ENVIRON.lock();
 
-    Status::Success
-}
+    env.update("cwd", path);
 
-fn find_in_node(fs: &MutexGuard<VSFS>, node: &impl Inode, path: &str) -> Status {
-    let children = fs.node_children(node);
-
-    for child in children {
-        if child.is_file() {
-            continue;
-        };
-
-        if child.name() == path {
-            let mut env = ENVIRON.lock();
-            env.update("cwd", &path);
-            return Status::Success;
-        }
-
-        find_in_node(fs, child, path)?;
-    }
-
-    Status::NotFound
-}
-
-fn find_from_root(fs: &MutexGuard<VSFS>, path: &str) -> Status {
-    if let Some(root) = fs.get_node(0) {
-        find_in_node(fs, root, path);
-    }
-
-    Status::NotFound
+    Some(())
 }

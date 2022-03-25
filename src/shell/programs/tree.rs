@@ -1,7 +1,4 @@
 use spin::MutexGuard;
-
-use crate::kernel::fs::vsfs::VSFS;
-
 crate::include_lib!(std, io, fs, env);
 
 pub fn main(_: Vec<String>) -> Status {
